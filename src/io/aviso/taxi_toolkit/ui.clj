@@ -63,22 +63,7 @@
   [el]
   (s/split (attribute el :class) #"\s+"))
 
-(defn has-class?
-  "Indicates whether element has a given class applied"
-  [css-class el]
-  (some #{css-class} (classes el)))
-
-(defn custom-disabled?
-  [el]
-  (has-class? "disabled" el))
-
 (defn fill-form
   "Fill a form. Accepts a map of 'element - text' pairs."
   [el-val]
   (mapv (fn [[el txt]] (input-text (apply $ (as-vector el)) txt)) el-val))
-
-(def hidden? (complement visible?))
-(def disabled? (complement enabled?))
-(def has-no-class? (complement has-class?))
-(def custom-enabled? (complement custom-disabled?))
-

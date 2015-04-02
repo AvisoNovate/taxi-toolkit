@@ -34,6 +34,16 @@
   [el]
   (is (nil? el)))
 
+(defn has-class?
+  "Indicates whether element has a given class applied"
+  [css-class]
+  (fn [el]
+    (some #{css-class} (classes el))))
+
+(def has-no-class? (complement has-class?))
+(def hidden? (complement visible?))
+(def disabled? (complement enabled?))
+
 (defn count= [n]
   "UI assertion for number of elements"
   (fn [els]
