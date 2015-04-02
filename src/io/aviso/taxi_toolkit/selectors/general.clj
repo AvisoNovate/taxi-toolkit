@@ -10,8 +10,8 @@
 
 (defn by-css
   "Find element by CSS selector"
-  [selector]
-  {:css selector})
+  [& xs]
+  {:css (apply str xs)})
 
 (defn by-attribute
   "Find element by attribute value"
