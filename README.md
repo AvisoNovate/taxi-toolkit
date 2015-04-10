@@ -161,6 +161,12 @@ Finds element by CSS selector.
 
 Finds an element which contents match exact text given.
 
+#### by-exact-text
+
+`(by-partial-text "lab")`
+
+Finds an element which contents contain given text.
+
 #### by-role
 
 `(by-role "some-menu")`

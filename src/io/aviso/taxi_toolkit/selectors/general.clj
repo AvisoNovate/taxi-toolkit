@@ -32,3 +32,8 @@
   "Finds element containing the exact text given."
   [txt]
   (by-xpath "//*[text()='" txt "']"))
+
+(defn by-partial-text
+  "Finds element containing the given text (partial match)."
+  [txt]
+  (by-xpath "//*[contains(text(), '" txt "')]"))
