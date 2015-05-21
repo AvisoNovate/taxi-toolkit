@@ -405,6 +405,12 @@ pattern.
 
 Waits for an element to become visible.
 
+#### wait-for-removed
+
+`(wait-for-removed :menu :log-in)`
+
+Waits for an element to be removed from the DOM.
+
 ### Actions
 
 #### a-click

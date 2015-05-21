@@ -53,3 +53,8 @@
   [& el-spec]
   (apply wait-for el-spec)
   (apply a-click el-spec))
+
+(defn wait-for-removed
+  "Waits for an element to be removed from the DOM"
+  [& el-spec]
+  (wait-until #(nil? (apply $ el-spec)) webdriver-timeout))
