@@ -2,7 +2,7 @@
   "So it's easier to require all this."
   (:require [potemkin :refer [import-vars]]
             [io.aviso.taxi-toolkit
-             [assertions ui waiters]]
+             [assertions ui waiters actions]]
             [io.aviso.taxi-toolkit.selectors.angular]
             [io.aviso.taxi-toolkit.selectors.general]
             [io.aviso.taxi-toolkit.selectors.complex]))
@@ -24,6 +24,7 @@
 (import-ns-vars io.aviso.taxi-toolkit.assertions)
 (import-ns-vars io.aviso.taxi-toolkit.ui)
 (import-ns-vars io.aviso.taxi-toolkit.waiters)
+(import-ns-vars io.aviso.taxi-toolkit.actions)
 (import-ns-vars io.aviso.taxi-toolkit.selectors.general)
 (import-ns-vars io.aviso.taxi-toolkit.selectors.angular)
 (import-ns-vars io.aviso.taxi-toolkit.selectors.complex)
