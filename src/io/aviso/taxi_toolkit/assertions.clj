@@ -40,9 +40,9 @@
   (fn [el]
     (some #{css-class} (classes el))))
 
-(def has-no-class? (complement has-class?))
 (def hidden? (complement visible?))
 (def disabled? (complement enabled?))
+(def has-no-class? #(complement (has-class? %)))
 
 (defn count= [n]
   "UI assertion for number of elements"
@@ -87,8 +87,9 @@
 (defn assert-nav
   "Helper for asserting whether clicking element (or sequence of elements)
   causes browser window to navigate to a certain URL."
-  [els url]
-  (doseq [el els]
-    (wait-and-click el))
-  (wait-until #(re-find (re-pattern url) (current-url))))
 
+  [& args]
+  (let [ui-actions (butlast args)
+        url (last args)]
+    (apply a-ui ui-actions)
+    (wait-for-url url)))
