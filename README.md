@@ -161,7 +161,7 @@ Finds element by CSS selector.
 
 Finds an element which contents match exact text given.
 
-#### by-exact-text
+#### by-partial-text
 
 `(by-partial-text "lab")`
 
@@ -191,9 +191,13 @@ Finds element by the value of `ng-bind` attribute.
 
 #### by-ng-click
 
+`(by-ng-click "someFn()")`
+
 Finds element by the value of `ng-click` attribute.
 
 #### by-ng-model
+
+`(by-ng-model "people")`
 
 Finds element by the value of `ng-model` attribute.
 
