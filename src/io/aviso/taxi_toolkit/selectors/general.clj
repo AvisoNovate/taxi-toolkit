@@ -6,7 +6,7 @@
   Use either (by-xpath \"...\") to find one element,
   or (by-xpath :all \"...\") to find all."
   [& xs]
-  (apply str xs))
+  {:xpath (apply str xs)})
 
 (defn by-css
   "Find element by CSS selector"
