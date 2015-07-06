@@ -14,7 +14,7 @@
 
 (defn set-ui-spec!
   [& xs]
-  (reset! ui-maps (apply merge (map gen-ui-map xs))))
+  (reset! ui-maps (apply merge xs)))
 
 (defn $
   "Find one element"
