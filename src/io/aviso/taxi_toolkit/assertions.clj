@@ -29,6 +29,16 @@
   (let [focused-el (execute-script "return document.activeElement;")]
     (is (= (:webelement el) focused-el) "Element appears not to be in focus")))
 
+(defn is-missing?
+	"Faster assertion for missing element."
+  [el-id]
+  (let [selector (query-with-params {} el-id)
+        js (if (:css selector)
+             (str "return document.querySelectorAll(\"" (:css selector) "\").length;")
+             (str "return document.evaluate(\"count(" selector ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
+        cnt (execute-script js)]
+    (is (= 0 cnt) (str "Element " el-id " is not missing - found " cnt " of those."))))
+
 (defn missing?
   "UI assertion for a element which should not be in a DOM"
   [el]
@@ -38,7 +48,7 @@
   "Indicates whether element has a given class applied"
   [css-class]
   (fn [el]
-    (some #{css-class} (classes el))))
+    (not (nil? (some #{css-class} (classes el))))))
 
 (def hidden? (complement visible?))
 (def disabled? (complement enabled?))
