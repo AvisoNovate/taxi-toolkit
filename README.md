@@ -19,12 +19,11 @@ A Clojure library designed to help with writing integration tests using
 ;; Functions (by-...) are so-called "selectors" - they return a map
 ;; in a form accepted by (taxi/find-element).
 (def ui {:search-btn (by-ng-click "search()")
-         :form [(by-class-name ".search-form")
-                :name [:_ (by-ng-model "query.name")]
-                :age  [:_ (by-ng-model "query.name")]]
-         :results [(by-role "result-table")
-                   :all-rows (by-class-name ".row")]})
-
+         :form       {:self (by-class-name ".search-form")
+                      :name (by-ng-model "query.name")
+                      :age  (by-ng-model "query.name")}
+         :results    {:self (by-role "result-table")
+                      :all-rows (by-class-name ".row")}})
 
 (deftest user-interface
   ;; Register UI map
@@ -87,14 +86,19 @@ For example:
 (def ui {:submit-btn (by-exact-text "Submit")
          :cancel-btn (by-exact-text "Cancel")
          :even-rows  (by-xpath "//tr[position() mod 2 = 0]")
-         :menu       [(by-role "user-menu")
+         :menu       {:self            (by-role "user-menu")
                       :change-password (by-ng-click "changePassword()")
-                      :log-out         (by-ng-click "logOut()")]})
+                      :log-out         (by-ng-click "logOut()")}})
 
 (set-ui-spec! ui)
 ```
 
-Top level UI elements can have children (one level nesting is currently supported)
+You can target decendants of top level UI elements (one level supported).
+
+```
+(def ui {:parent {:self      (...)
+                  :decendant (..)}})
+```
 - see the `:menu` element in an example above.
 
 #### set-ui-spec!
@@ -107,17 +111,24 @@ their label (which is a key in a map).
 
 #### $
 
-`($ :submit-btn)`
+```clojure
+;; Find element
+`($ :menu)`
 
-`($ :menu :change-password)`
+;; Same as above (find element)
+`($ :menu :self)`
 
+;; Find decendant to :menu
+`($ :menu :log-out)`
+
+;; Find by x-path
 `($ (by-xpath "//*[contains(@data-x, 'something')]"))`
+```
 
 Used to find one element matching the query. The preferred way of using this method
 is to pass the key(s) specifying element in the UI map.
 
 Alternatively, you can use a selector directly.
-
 
 #### $$
 
@@ -129,9 +140,8 @@ Same as `$`, but returns not one, but all matching elements.
 
 ### Simple selectors
 
-Selectors are simple functions that return either a string or a same map as
-accepted by `taxi/find-element`. If a string is returned, it is assumed to be
-an XPath expression.
+Selectors are simple functions that return the same map as
+accepted by `taxi/find-element`.
 
 taxi-toolkit comes with a basic set of selectors, as well as set of selectors
 useful in Angular application testing. You can easily write your own. Don't
@@ -345,7 +355,6 @@ Asserts that element contains the given text.
 (assert-ui {:submit-btn (text= "Submit")})
 ```
 
-
 ### Waiters
 
 When an action is performed, you often want to assert on the UI after it becomes
@@ -433,7 +442,7 @@ Works like `taxi/text` for elements such as `<div>` or `<p>`, and like
 
 #### classes
 
-`(clases ($ :menu :log-out))`
+`(classes ($ :menu :log-out))`
 
 #### click-not-clickable
 
