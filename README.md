@@ -165,11 +165,23 @@ Finds element by CSS class name.
 
 Finds element by CSS selector.
 
+#### by-id
+
+`(by-id "some-element")`
+
+Finds an element by DOM ID.
+
 #### by-exact-text
 
 `(by-exact-text "Some label")`
 
 Finds an element which contents match exact text given.
+
+#### by-name
+
+`(by-name "some-name")`
+
+Finds an element by name attribute.
 
 #### by-partial-text
 

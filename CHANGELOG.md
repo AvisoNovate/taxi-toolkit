@@ -2,6 +2,7 @@
 
 ## 0.1.4
 
+- New selectors: `by-id` and `by-name`.
 - `$` and `$$` now support nested elements with no UI map lookup, i.e.:
 
 ```clojure

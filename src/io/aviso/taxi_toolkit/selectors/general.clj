@@ -37,3 +37,13 @@
   "Finds element containing the given text (partial match)."
   [txt]
   (by-xpath "//*[contains(text(), '" txt "')]"))
+
+(defn by-name
+  "Finds (form) element by 'name' attribute."
+  [n]
+  (by-attribute "name" n))
+
+(defn by-id
+  "Finds element by ID."
+  [id]
+  (by-attribute "id" id))
