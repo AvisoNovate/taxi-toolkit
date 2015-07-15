@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 0.1.4
+
+- `$` and `$$` now support nested elements with no UI map lookup, i.e.:
+
+```clojure
+($ {:xpath "//div"} {:xpath "p"})
+```
+
+- Fixed `is-missing?` so it handles XPath selectors properly.
+- Fixed `query-with-params` so it handles nested elements properly. Note that parameters will be replaced only in the
+child selector, not in a parent selector.
+
 ## 0.1.3
 
 - Syntax has changed for nesting elements in the UI map. The new syntax:

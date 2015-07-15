@@ -28,7 +28,10 @@
     ;; reference up in the UI map:
     ;;   (find-with-f ... ... ... {:xpath "..."})
     ;;   (find-widt-f ... ... ... {:css "..."})
-    (f-one (first el-spec))
+    (if (= 1 (count el-spec))
+      (f-one (first el-spec))
+      (f-nested (find-element (first el-spec))
+                (second el-spec)))
 
     ;; Allows user to call function by looking the element
     ;; reference up in the UI map:

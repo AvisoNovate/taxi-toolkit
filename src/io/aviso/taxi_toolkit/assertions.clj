@@ -35,7 +35,7 @@
   (let [selector (query-with-params {} el-id)
         js (if (:css selector)
              (str "return document.querySelectorAll(\"" (:css selector) "\").length;")
-             (str "return document.evaluate(\"count(" selector ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
+             (str "return document.evaluate(\"count(" (or (:xpath selector) selector) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
         cnt (execute-script js)]
     (is (= 0 cnt) (str "Element " el-id " is not missing - found " cnt " of those."))))
 
