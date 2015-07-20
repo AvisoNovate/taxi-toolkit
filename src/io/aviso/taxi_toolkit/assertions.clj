@@ -30,7 +30,7 @@
     (is (= (:webelement el) focused-el) "Element appears not to be in focus")))
 
 (defn is-missing?
-	"Faster assertion for missing element."
+  "Faster assertion for missing element."
   [el-id]
   (let [selector (query-with-params {} el-id)
         js (if (:css selector)
