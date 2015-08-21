@@ -417,6 +417,12 @@ simply waits for 500 ms before proceeding.
 Waits for an element to contain the given text. Accepts either a string or a
 regular expression pattern.
 
+#### wait-for-present
+
+`(wait-for-present :log-out)`
+
+Waits for an element to exist in the DOM, and for it to become visible (`present?`). Convenient especially when asserting on an interactive element that was recently introduced in the DOM.
+
 #### wait-for-url
 
 `(wait-for-url #"/some-url")`

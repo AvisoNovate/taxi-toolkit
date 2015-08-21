@@ -43,6 +43,10 @@
     (catch org.openqa.selenium.TimeoutException err
       (is false (str "Expected URL to match: '" url "' but got: '" (current-url)"'")))))
 
+(defn wait-for-present
+  "Waits for an element to be considered present. Existing and visible."
+  [& el-spec]
+  (wait-until #(present? (apply $ el-spec)) webdriver-timeout))
 
 (defn wait-for-ng-animations
   "Waits for Angular animations to complete."
