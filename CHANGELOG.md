@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.5
+
+- New waiter function `wait-for-preset`.
+
 ## 0.1.4
 
 - New selectors: `by-id` and `by-name`.
