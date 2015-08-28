@@ -64,7 +64,7 @@
   [f expected]
   (fn [els]
     (let [match-result (doall (map (fn [[element expectation]]
-                                     ((text= expectation) element)) (zipmap els expected)))]
+                                     ((f expectation) element)) (zipmap els expected)))]
       (every? true? match-result))))
 
 (defn assert-ui

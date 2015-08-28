@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.6
+
+- Fixed a bug in each= so it respects the assert function passed as an argument (previously it was ignored and text= was always used).
+
 ## 0.1.5
 
 - New waiter function `wait-for-preset`.
