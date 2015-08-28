@@ -501,4 +501,10 @@ Example:
             :password "tiger"})
 ```
 
+#### clear-with-backspace
 
+Given an input element, presses backspace key as many times as it takes to clear it.
+
+```clojure
+(clear-with-backspace :some-el)
+```

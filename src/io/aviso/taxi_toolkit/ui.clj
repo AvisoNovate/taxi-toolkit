@@ -6,7 +6,8 @@
             [clojure.test :refer [is]]
             [io.aviso.taxi-toolkit
              [utils :refer :all]
-             [ui-map :refer :all]]))
+             [ui-map :refer :all]])
+  (:import org.openqa.selenium.Keys))
 
 (def webdriver-timeout (* 15 1000))
 (def ^:private ui-maps (atom {}))
@@ -72,3 +73,10 @@
   "Fill a form. Accepts a map of 'element - text' pairs."
   [el-val]
   (mapv (fn [[el txt]] (input-text (apply $ (as-vector el)) txt)) el-val))
+
+(defn clear-with-backspace
+  "Clears the input by pressing the backspace key until it's empty."
+  [& el-spec]
+  (let [el (apply $ el-spec)
+        n-of-strokes (count (a-text el))]
+    (doall (repeatedly n-of-strokes #(send-keys el org.openqa.selenium.Keys/BACK_SPACE)))))
