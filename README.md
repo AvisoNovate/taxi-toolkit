@@ -359,6 +359,22 @@ Asserts that element does not exist in the DOM.
 (assert-ui {:submit-btn missing?})
 ```
 
+#### selected?
+
+Asserts that a checkbox is selected.
+
+```clojure
+(assert-ui {:agree-checkbox selected?})
+```
+
+#### deselected?
+
+Asserts that a checkbox in not selected.
+
+```clojure
+(assert-ui {:agree-checkbox deselected?})
+```
+
 #### text=
 
 Asserts that element contains the given text.

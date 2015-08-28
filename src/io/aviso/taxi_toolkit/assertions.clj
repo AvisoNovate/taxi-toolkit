@@ -1,6 +1,6 @@
 (ns io.aviso.taxi-toolkit.assertions
   "Assertion helpers for UI elements."
-  (:require [clj-webdriver.taxi :refer :all]
+  (:require [clj-webdriver.taxi :as t]
             [clojure.string :as s]
             [clojure.test :refer [is]]
             [io.aviso.taxi-toolkit
@@ -19,14 +19,14 @@
   "UI assertion for an arbitrary attribute value."
   [attr-name attr-value]
   (fn [el]
-    (let [actual-value (attribute el attr-name)]
+    (let [actual-value (t/attribute el attr-name)]
       (is (= actual-value attr-value) (format "Expected attribute <<%s> Actual <<%s>>"
                                               attr-value actual-value)))))
 
 (defn focused?
   "Asserts whether given element is in focus."
   [el]
-  (let [focused-el (execute-script "return document.activeElement;")]
+  (let [focused-el (t/execute-script "return document.activeElement;")]
     (is (= (:webelement el) focused-el) "Element appears not to be in focus")))
 
 (defn is-missing?
@@ -36,7 +36,7 @@
         js (if (:css selector)
              (str "return document.querySelectorAll(\"" (:css selector) "\").length;")
              (str "return document.evaluate(\"count(" (or (:xpath selector) selector) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
-        cnt (execute-script js)]
+        cnt (t/execute-script js)]
     (is (= 0 cnt) (str "Element " el-id " is not missing - found " cnt " of those."))))
 
 (defn missing?
@@ -50,9 +50,17 @@
   (fn [el]
     (not (nil? (some #{css-class} (classes el))))))
 
-(def hidden? (complement visible?))
-(def disabled? (complement enabled?))
+(defn selected?
+  [expect-selected?]
+  (fn [el]
+    (let [actual (t/selected? el)]
+      (is (= actual expect-selected?) (format "Expected to be <<%s>> but is not"
+                                              (if expect-selected? "selected" "unselected"))))))
+
+(def hidden? (complement t/visible?))
+(def disabled? (complement t/enabled?))
 (def has-no-class? #(complement (has-class? %)))
+(def deselected? #(complement (selected? %)))
 
 (defn count= [n]
   "UI assertion for number of elements"
