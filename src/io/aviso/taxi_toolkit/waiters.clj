@@ -6,7 +6,8 @@
             [clojure.test :refer [is]]
             [io.aviso.taxi-toolkit
              [ui :refer :all]
-             [utils :refer :all]]))
+             [utils :refer :all]
+             [assertions :as at]]))
 
 (defn wait-for
   "Waits for element to appear in the DOM."
@@ -67,6 +68,22 @@
   "Waits for an element to be removed from the DOM"
   [& el-spec]
   (wait-until #(nil? (apply $ el-spec)) webdriver-timeout))
+
+(defn wait-for-class
+  "Waits for an element to have a certain class"
+  [cls & el-spec]
+  (try
+    (wait-until #((at/has-class? cls) (apply $ el-spec)) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException err
+      (is false (str "Waited for class '" cls "' to appear on " el-spec " but it never did.")))))
+
+(defn wait-for-class-removed
+  "Waits for an element to NOT have a certain class"
+  [cls & el-spec]
+  (try
+    (wait-until #((at/has-no-class? cls) (apply $ el-spec)) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException err
+      (is false (str "Waited for element " el-spec " to NOT have class '" cls "', but that never happened.")))))
 
 (defn a-hover
   "Hover an item."
