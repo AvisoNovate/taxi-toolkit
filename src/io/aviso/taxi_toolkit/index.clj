@@ -3,10 +3,10 @@
   (:require [potemkin :refer [import-vars]]
             [io.aviso.taxi-toolkit
              [assertions ui waiters]]
+            [io.aviso.taxi-toolkit.composite-assertions]
             [io.aviso.taxi-toolkit.selectors.angular]
             [io.aviso.taxi-toolkit.selectors.general]
             [io.aviso.taxi-toolkit.selectors.complex]))
-
 
 (defn ns-public-symbols
   "Returns a sequence of all public synbols from a namespace,
@@ -22,6 +22,7 @@
     `(import-vars ~x)))
 
 (import-ns-vars io.aviso.taxi-toolkit.assertions)
+(import-ns-vars io.aviso.taxi-toolkit.composite-assertions)
 (import-ns-vars io.aviso.taxi-toolkit.ui)
 (import-ns-vars io.aviso.taxi-toolkit.waiters)
 (import-ns-vars io.aviso.taxi-toolkit.selectors.general)
