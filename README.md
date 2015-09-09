@@ -458,6 +458,18 @@ Waits for an element to become visible.
 
 Waits for an element to be removed from the DOM.
 
+#### wait-for-class
+
+`(wait-for-class "active" :menu :log-out)`
+
+Waits for an element to have a certain class.
+
+#### wait-for-class-removed
+
+`(wait-for-class-removed "disabled" :menu :log-out)`
+
+Waits until an element is missing a certain class.
+
 ### Actions
 
 #### a-click
