@@ -85,6 +85,14 @@
     (catch org.openqa.selenium.TimeoutException err
       (is false (str "Waited for element " el-spec " to NOT have class '" cls "', but that never happened.")))))
 
+(defn wait-for-element-count
+  "Waits for the number of elements to be found by a selector to match expected number."
+  [no & el-spec]
+  (try
+    (wait-until #(= (count (apply $$ el-spec)) no) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException err
+      (is false (str "Waited for exactly " no " elements to be found by selector " el-spec " but found " (count (apply $$ el-spec)))))))
+
 (defn a-hover
   "Hover an item."
   [& el-spec]
