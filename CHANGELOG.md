@@ -11,7 +11,7 @@
 
 ## 0.1.5
 
-- New waiter function `wait-for-preset`.
+- New waiter function `wait-for-present`.
 
 ## 0.1.4
 
