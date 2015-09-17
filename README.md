@@ -470,6 +470,12 @@ Waits for an element to have a certain class.
 
 Waits until an element is missing a certain class.
 
+#### wait-for-element-count
+
+`(wait-for-element-count 8 :menu :items)`
+
+Waits until the number of elements found by selector matches the expected count.
+
 ### Actions
 
 #### a-click

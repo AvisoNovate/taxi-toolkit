@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.1.7
+- New waiter function `wait-for-element-count`.
+
 ## 0.1.6
 
 - Added: clear-with-backspace.
