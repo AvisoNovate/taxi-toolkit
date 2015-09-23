@@ -1,6 +1,38 @@
 # CHANGELOG
 
+## 0.2.0
+
+- Improved fail message for some waiters.
+- Only assertion function from taxi-toolkit is accepted by `assert-ui`.
+- Most (if not all) relevant UI checks from taxi now has a corresponding assertion in taxi-toolkit.
+- `assert-ui` no longer asserts by itself, but simply runs assertion functions from taxi-toolkit. This enables possibility for more eloquent, relevant and verbose fail messages.
+- `each` may now be called with either 1 argument or 2 arguments, depending on if the assertion is simple or requires an expected value.
+- Assertions now have a uniform name convension.
+  - ~~`text=`~~ `has-text?`
+  - ~~`attr=`~~ `has-attr?` or `has-attribute?`
+  - ~~`count=`~~ `is-count?` or `found-exact-nr?` `is-exactly-nr?`
+  - ~~`visible?`~~ `is-visible?`
+  - ~~`focused?`~~ `is-focused?`
+  - ~~`missing?`~~ `is-missing?`
+  - ~~`is-missing?`~~ `x-is-missing?` _(express function)_
+  - ~~`selected?`~~ `is-selected?`
+  - ~~`hidden?`~~ `is-hidden?`
+  - ~~`enabled?`~~ `is-enabled?`
+  - ~~`disabled?`~~ `is-disabled?`
+- Added new assertion functions.
+  - `has-value?`
+  - `is-not-focused?`
+  - `is-present?`
+  - `is-existing?`
+  - `is-not-selected?` or `is-deselected?`
+  - `is-displayed?` _alias of `is-visible?`_
+  - `allows-multiple?`
+  - `is-not-multiple?`
+  - `has-page-title?`
+- Revised documentation (readme).
+
 ## 0.1.7
+
 - New waiter function `wait-for-element-count`.
 
 ## 0.1.6

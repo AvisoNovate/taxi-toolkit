@@ -33,7 +33,7 @@
     (let [collection? (-> el-spec meta :all)
           find-fn (if collection? $$ $)
           el (apply find-fn (as-vector el-spec))]
-      (is (assert-fn el) (str el-spec " assertion failed at " assert-fn)))))
+      (assert-fn el))))
 
 (defn assert-nav
   "Helper for asserting whether clicking element (or sequence of elements)

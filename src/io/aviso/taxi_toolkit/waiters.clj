@@ -1,7 +1,7 @@
 (ns io.aviso.taxi-toolkit.waiters
   "Assertion helpers for UI elements."
   (:require [clj-webdriver.taxi :refer :all]
-				  	[clj-webdriver.core :refer [->actions move-to-element]]
+            [clj-webdriver.core :refer [->actions move-to-element]]
             [clojure.string :as s]
             [clojure.test :refer [is]]
             [io.aviso.taxi-toolkit
@@ -33,7 +33,10 @@
   "Waits for element to be enabled."
   [& el-spec]
   (apply wait-for el-spec)
-  (wait-until #(enabled? (apply $ el-spec)) webdriver-timeout))
+  (try
+    (wait-until #(enabled? (apply $ el-spec)) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException err
+      (is false (str "Waited for element " el-spec " to be enabled.")))))
 
 (defn wait-for-url
   "Waits for the browser to load an URL which would match (partially)
@@ -47,7 +50,10 @@
 (defn wait-for-present
   "Waits for an element to be considered present. Existing and visible."
   [& el-spec]
-  (wait-until #(present? (apply $ el-spec)) webdriver-timeout))
+  (try
+    (wait-until #(present? (apply $ el-spec)) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException err
+      (is false (str "Waited for element " el-spec " to be present.")))))
 
 (defn wait-for-ng-animations
   "Waits for Angular animations to complete."
@@ -73,7 +79,7 @@
   "Waits for an element to have a certain class"
   [cls & el-spec]
   (try
-    (wait-until #((at/has-class? cls) (apply $ el-spec)) webdriver-timeout)
+    (wait-until #(some #{cls} (classes (apply $ el-spec))) webdriver-timeout)
     (catch org.openqa.selenium.TimeoutException err
       (is false (str "Waited for class '" cls "' to appear on " el-spec " but it never did.")))))
 
@@ -81,7 +87,7 @@
   "Waits for an element to NOT have a certain class"
   [cls & el-spec]
   (try
-    (wait-until #((at/has-no-class? cls) (apply $ el-spec)) webdriver-timeout)
+    (wait-until #(nil? (some #{cls} (classes (apply $ el-spec)))) webdriver-timeout)
     (catch org.openqa.selenium.TimeoutException err
       (is false (str "Waited for element " el-spec " to NOT have class '" cls "', but that never happened.")))))
 
