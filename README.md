@@ -33,10 +33,10 @@ A Clojure library designed to help with writing integration tests using
 
   ;; (assert-ui) accepts a map, where keys refer to the UI elements declared
   ;; in the UI map, and values are an assertions (or vector of assertions).
-  (assert-ui {:filter-btn          [visible? (text= "Filter")]
-              [:form :name]        visible?
-              [:form :age]         visible?
-              :results             hidden?})
+  (assert-ui {:filter-btn          [is-visible? (has-text? "Filter")]
+              [:form :name]        is-visible?
+              [:form :age]         is-visible?
+              :results             is-hidden?})
 
   ;; (fill-form) is a helper to quickly input text into multiple UI elements.
   (fill-form {:name "Jorge Luis Borges"
@@ -45,14 +45,14 @@ A Clojure library designed to help with writing integration tests using
   (a-click :filter-btn)
   (wait-for-visible :results)
 
-  (assert-ui {:form                 hidden?
-              :results              visible?
-              ;; With the ^:all hint, assertions will be made on all
-              ;; elements found with the given query, not only one.
-              ;; (each) is a helper function to assert on all elements.
-              ^:all [:results :all-rows]
-                                    (each text= ["result1" "result2"
-                                                 "result3"])})
+  (assert-ui {:form                      is-hidden?
+              :results                   is-visible?
+              ;; With the ^:all hint, assertions will be made on all elements
+              ;; found with the given query.
+              ;; `(each)` is a helper function to assert on each or all elements.
+              ^:all [:results :all-rows] [(each is-visible?)
+                                          (each (has-class? "result-row"))
+                                          (each has-text? ["result1" "result2"])]})
 
    ;; If you need to use raw Taxi API to interact with UI elements, you can
    ;; use ($) and ($$) functions to get one or all matching elements
@@ -97,7 +97,7 @@ You can target decendants of top level UI elements (one level supported).
 
 ```
 (def ui {:parent {:self      (...)
-                  :decendant (..)}})
+                  :decendant (...)}})
 ```
 - see the `:menu` element in an example above.
 
@@ -263,7 +263,7 @@ taxi-toolkit contains a set of functions helpful in writing readable test cases.
 `(assert-ui m)`
 
 Accepts a map of element - assertion pairs. Each assertion will be run over
-given element. If any of the assertions fails, `assert-ui` fails.
+given element.
 
 By default, for each element key, one element is found. If you wish to assert
 on all matching elements, you need to use `^:all` hint. See (`each`).
@@ -276,9 +276,9 @@ This function required UI map to be set.
 Example:
 
 ```clojure
-(assert-ui {:submit-btn      hidden?
-            :cancel-btn      [visible? (text= "Cancel")]
-            [:menu :log-out] [visible? (text= "Log out")]})
+(assert-ui {:submit-btn      is-hidden?
+            :cancel-btn      [is-visible? (has-text? "Cancel")]
+            [:menu :log-out] [is-visible? (has-text? "Log out")]})
 ```
 
 #### assert-nav
@@ -294,44 +294,135 @@ Example:
 (assert-nav [:cancel-btn] "/some-page-url")
 ```
 
-#### attr=
+#### has-attr?
 
 Asserts that element has an attribute with the given value.
 
 ```clojure
-(assert-ui {:submit-btn (attr= "role" "some-role")})
+(assert-ui {:submit-btn (has-attr? "role" "some-role")})
 ```
 
-#### count=
+_Alias: `has-attribute?`_
+
+#### has-value?
+
+Asserts that an element has the given value.
+
+```clojure
+(assert-ui {:password  (has-value? "Pass123")})
+```
+
+#### is-present?
+
+Asserts that an element is considered present (existing and visible).
+
+```clojure
+(assert-ui {:submit-button is-present?})
+```
+
+#### is-existing?
+
+Asserts that an element exists.
+
+```clojure
+(assert-ui {:hidden-form-input is-existing?})
+```
+
+#### is-count?
 
 Asserts that selector matches the given number of elements.
 
 ```clojure
-(assert-ui {^:all [:even-rows] (count= 3)})
+(assert-ui {^:all [:even-rows]  (is-count? 3)})
 ```
 
-#### disabled?
+_Alias: `found-exact-nr?`, `is-exactly-nr?`_
 
-Complements `taxi/enabled?`.
+#### is-enabled?
+
+Asserts that an element is enabled.
+
+```clojure
+(assert-ui {:submit-btn is-enabled?})
+```
+
+#### is-disabled?
+
+Assert that an element is not disabled.
+
+```clojure
+(assert-ui {:submit-btn is-disabled?})
+```
+
+#### allows-multiple?
+
+Assert that a `<select>` element allows for multiple selections.
+
+```clojure
+(assert-ui {:known-languages allows-multiple?})
+```
+
+#### is-not-multiple?
+
+Assert that a `<select>` element doesn't allow multiple selections.
+
+```clojure
+(assert-ui {:country-of-birth is-not-multiple?})
+```
+
+#### has-page-title?
+
+Assert that the page's title is as given. This assertion may not be made
+on an element, since it's asserting agains the `<title>` value of the page.
+
+```clojure
+(has-page-title? "Welcome to the Jungle")
+```
 
 #### each
 
-`(each assert-fn expected-values-vector)
+Helps with running the same assertion function over multiple elements.
+Can also be used to run one assertion on multiple elements and matching
+response to each item in a given vector.
 
-Helps with asserting when selector matches multiple elements. Runs a given
-assertion on each matching element, expecting the corresponding value from the
-vector given.
+`(each assert-fn)`
+`(each (assert-fn assert-fn-arg))`
+`(each assert-fn expected-values-vector)`
+
+Called simply with one argument, the assert-fn will run for each element
+matching the selector. See below.
 
 ```clojure
-(assert-ui {^:all [:even-rows] (each text= ["Row2" "Row4" "Row6"])})
+(each is-visible?)
 ```
 
-#### focused?
+The assert-fn may be invoked in case itself returns an assert-fn. See below.
+
+```clojure
+(each (has-class? "featured"))
+```
+
+Called with two arguments, `each` will expect a return value from the assert-fn
+to match against the corresponding item in the given vector. See below.
+
+```clojure
+(assert-ui {^:all [:even-rows]  (each has-text? ["Row2" "Row4" "Row6"])})
+```
+
+#### is-focused?
 
 Asserts that element is in focus.
 
 ```clojure
-(assert-ui {:submit-btn focused?})
+(assert-ui {:submit-btn is-focused?})
+```
+
+#### is-not-focused?
+
+Asserts that element is not in focus.
+
+```clojure
+(assert-ui {:submit-btn is-not-focused?})
 ```
 
 #### has-class?
@@ -340,47 +431,77 @@ Asserts that element has CSS class applied. Only classes applied using a HTML
 `class` attribute are taken into an account:
 
 ```clojure
-(assert-ui {:submit-btn (has-class? "btn-danger")})
+(assert-ui {:submit-btn (has-class? "btn-success")})
 ```
 
 #### has-no-class?
 
-Complements `has-class?`.
+Asserts that element does not have a CSS class applied.
 
-#### hidden?
+```clojure
+(assert-ui {:submit-btn (has-no-class? "btn-danger")})
+```
 
-Complements `taxi/visible?`.
+#### is-visible?
 
-#### missing?
+Asserts that an element is visible.
+
+```clojure
+(assert-ui {:submit-btn is-visible?})
+```
+
+_Alias: `is-displayed?`_
+
+#### is-hidden?
+
+Asserts that an element is hidden.
+
+```clojure
+(assert-ui {:next-btn is-hidden?})
+```
+
+#### is-missing?
 
 Asserts that element does not exist in the DOM.
 
 ```clojure
-(assert-ui {:submit-btn missing?})
+(assert-ui {:submit-btn is-missing?})
 ```
 
-#### selected?
+#### x-is-missing?
 
-Asserts that a checkbox is selected.
+Asserts that element does not exist in the DOM.
+(faster than the regular `is-missing`, but can not
+be used in `assert-ui`).
 
 ```clojure
-(assert-ui {:agree-checkbox selected?})
+(x-is-missing? :loader-animation)
 ```
 
-#### deselected?
+#### is-selected?
 
-Asserts that a checkbox in not selected.
+Asserts that an element is selected.
 
 ```clojure
-(assert-ui {:agree-checkbox deselected?})
+(assert-ui {:agree-checkbox is-selected?})
 ```
 
-#### text=
+#### is-not-selected?
+
+Asserts that an element is not selected.
+
+```clojure
+(assert-ui {:no-insurance-please is-not-selected?})
+```
+
+_Alias: `is-deselected`_
+
+#### has-text?
 
 Asserts that element contains the given text.
 
 ```clojure
-(assert-ui {:submit-btn (text= "Submit")})
+(assert-ui {:submit-btn (has-text? "Submit")})
 ```
 
 ### Waiters
@@ -496,7 +617,7 @@ Works like `taxi/text` for elements such as `<div>` or `<p>`, and like
 
 `(classes ($ :menu :log-out))`
 
-#### click-not-clickable
+#### click-non-clickable
 
 `(click-non-clickable ($ :menu :log-out))`
 

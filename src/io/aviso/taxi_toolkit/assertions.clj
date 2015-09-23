@@ -7,69 +7,150 @@
              [ui :refer :all]
              [utils :refer :all]]))
 
-(defn text=
+(defn has-text?
   "UI assertion for text content. Use either text or regular expression."
   [txt]
   (fn [el]
     (let [actual-txt (s/trim (a-text el))]
-      (is ((str-eq txt) actual-txt) (format "Expected <<%s>> Actual <<%s>>" txt actual-txt)))))
+      (is ((str-eq txt) actual-txt) (format "Expected <<%s>> Actual <<%s>>." txt actual-txt)))))
 
-(defn attr=
+(defn has-attr?
   "UI assertion for an arbitrary attribute value."
   [attr-name attr-value]
   (fn [el]
     (let [actual-value (t/attribute el attr-name)]
-      (is (= actual-value attr-value) (format "Expected attribute <<%s> Actual <<%s>>"
-                                              attr-value actual-value)))))
+      (is (= actual-value attr-value) (format "Expected attribute <<%s> Actual <<%s>>, on <<%s>>."
+                                              attr-value actual-value el)))))
 
-(defn focused?
-  "Asserts whether given element is in focus."
+(def has-attribute? has-attr?)
+
+(defn has-value?
+  "UI assertion for an element's value to be as expected."
+  [expected-value]
+  (fn [el]
+    (is (= (t/value el) expected-value) (str "Expected element's value to be '" expected-value "', but was '" (t/value el) "'."))))
+
+(defn is-focused?
+  "Asserts that an element is in focus."
   [el]
-  (let [focused-el (t/execute-script "return document.activeElement;")]
-    (is (= (:webelement el) focused-el) "Element appears not to be in focus")))
+  (let [focused-el (t/execute-script "return document.activeElement;")
+        topic-el   (:webelement el)]
+    (is (= topic-el focused-el) (str "Element appears not to be in focus."))))
+
+(defn is-not-focused?
+  "Asserts that an element is NOT in focus."
+  [el]
+  (let [focused-el (t/execute-script "return document.activeElement;")
+        topic-el   (:webelement el)]
+    (is (not (= topic-el focused-el)) (str "Element appears to be in focus, but it wasn't expected to be."))))
+
+(defn is-present?
+  "UI assertion for an element to exist."
+  [el]
+  (is (t/present? el) (str "Expected element to be present (existing and visible).")))
+
+(defn is-existing?
+  "UI assertion for an element to be in the DOM."
+  [el]
+  (is (t/exists?) (str "Expected element to exist in the DOM, but it didn't.")))
 
 (defn is-missing?
+  "UI assertion for an element which should not be in a DOM."
+  [el]
+  (is (nil? el) (str "Expected element to be missing (nil), but it exists (wasn't nil).")))
+
+(defn has-class?
+  "UI assertion for a CSS class to exist on a certain element."
+  [css-class]
+  (fn [el]
+    (is (not (nil? (some #{css-class} (classes el)))) (str "Expected element to have the class '" css-class "' but it didn't.  It had: " (classes el) "."))))
+
+(defn has-no-class?
+  "UI assertion for a CSS class to NOT exist on a certain element."
+  [css-class]
+  (fn [el]
+    (is (nil? (some #{css-class} (classes el))) (str "Expected element to NOT have the class '" css-class "' but it did. It had: " (classes el) "."))))
+
+(defn is-selected?
+  "UI assertion for an <option> element to be selected."
+  [el]
+  (is (t/selected? el) (str "Expected element (option) to be selected, but it wasn't.")))
+
+(defn is-not-selected?
+  "UI assertion for an <option> element to NOT be selected."
+  [el]
+  (is (not (t/selected? el)) (str "Expected element (option) to NOT be selected, but it was.")))
+
+(def is-deselected? is-not-selected?)
+
+(defn is-visible?
+  "UI assertion for an element to be visible."
+  [el]
+  (is (t/visible? el) (str "Expected element to be visible/displayed, but it wasn't.")))
+
+(def is-displayed? is-visible?)
+
+(defn is-hidden?
+  "UI assertion for an element to be considered hidden (not visible)."
+  [el]
+  (is (not (t/visible? el)) (str "Expected element to be hidden, but it was visible.")))
+
+(defn is-enabled?
+  "UI assertion for an element to be enabled."
+  [el]
+  (is (t/enabled? el) (str "Expected element to be enabled, but it was not.")))
+
+(defn is-disabled?
+  "UI assertion for an element to be disabled (not enabled)."
+  [el]
+  (is (not (t/enabled? el)) (str "Expected element to be disabled, but it was enabled.")))
+
+(defn allows-multiple?
+  "UI assertion for a <select> to allow for multiple selections."
+  [el]
+  (is (t/multiple? el) (str "Expected select element to allow multiple selections, but it didn't.")))
+
+(defn is-not-multiple?
+  "UI assertion for a <select> to NOT allow for multiple selections."
+  [el]
+  (is (not (t/multiple? el)) (str "Expected select element to NOT allow multiple selections, but it did.")))
+
+; This assertion is not made upon an element (ie. it will not run with `assert-ui`)
+(defn has-page-title?
+  "Assert for the page title to be as expected."
+  [page-title]
+  (is (= (t/title) page-title) (str "Expected page title to be '" page-title "', but it was '" (t/title)"'.")))
+
+; Faster (express) version of `is-missing?`
+; Will not run with `assert-ui`
+(defn x-is-missing?
   "Faster assertion for missing element."
-  [el-id]
-  (let [selector (query-with-params {} el-id)
+  [el-spec]
+  (let [selector (query-with-params {} el-spec)
         js (if (:css selector)
              (str "return document.querySelectorAll(\"" (:css selector) "\").length;")
              (str "return document.evaluate(\"count(" (or (:xpath selector) selector) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
         cnt (t/execute-script js)]
-    (is (= 0 cnt) (str "Element " el-id " is not missing - found " cnt " of those."))))
+    (is (= 0 cnt) (str "Element " el-spec " is not missing - found " cnt " of those."))))
 
-(defn missing?
-  "UI assertion for a element which should not be in a DOM"
-  [el]
-  (is (nil? el)))
-
-(defn has-class?
-  "Indicates whether element has a given class applied"
-  [css-class]
-  (fn [el]
-    (not (nil? (some #{css-class} (classes el))))))
-
-(defn selected?
-  [expect-selected?]
-  (fn [el]
-    (let [actual (t/selected? el)]
-      (is (= actual expect-selected?) (format "Expected to be <<%s>> but is not"
-                                              (if expect-selected? "selected" "unselected"))))))
-
-(def hidden? (complement t/visible?))
-(def disabled? (complement t/enabled?))
-(def has-no-class? #(complement (has-class? %)))
-(def deselected? #(complement (selected? %)))
-
-(defn count= [n]
-  "UI assertion for number of elements"
+(defn is-count?
+  "UI assertion for number of elements."
+  [n]
   (fn [els]
-    (is (= n (count els)))))
+    (is (= n (count els)) (str "Expected to find " n " elements, but found " (count els) "."))))
+
+(def found-exact-nr? is-count?)
+(def is-exactly-nr? is-count?)
 
 (defn each
   "Run given assertion for every item in the collection."
-  [f expected]
-  (fn [els]
-    (let [match-result (doall (map (fn [[element expectation]]
-                                     ((f expectation) element)) (zipmap els expected)))]
-      (every? true? match-result))))
+  ([f]
+    (fn [els]
+      (let [match-result (doall (map (fn [element]
+                                       (f element)) els))]
+        (every? true? match-result))))
+  ([f expected]
+    (fn [els]
+      (let [match-result (doall (map (fn [[element expectation]]
+                                       ((f expectation) element)) (zipmap els expected)))]
+        (every? true? match-result)))))
