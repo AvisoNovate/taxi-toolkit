@@ -28,3 +28,13 @@
                "/div[count(//*[@ng-header-row]/div[*//text()='"         ; Use count() as an index of a cell in a row. Count
                header-label                                             ; the header cells preceding the header cell with
                "']/preceding-sibling::div) + 1]"))))                    ; the given label.
+
+(defn by-ng-show
+  "Find element by AngularJS ng-show attribute."
+  [ng-show]
+  (by-attribute "ng-show" ng-show))
+
+(defn by-ng-hide
+  "Find element by AngularJS ng-hide attribute."
+  [ng-hide]
+  (by-attribute "ng-hide" ng-hide))
