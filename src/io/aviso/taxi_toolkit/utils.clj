@@ -41,7 +41,7 @@
     (try
       (f)
       (catch Exception e
-        (if (> (System/currentTimeMillis) (+ (* 1000 1000) timestamp))
+        (if (> (System/currentTimeMillis) (+ 1000 timestamp))
           (throw e)
           (do
             (Thread/sleep 100)
