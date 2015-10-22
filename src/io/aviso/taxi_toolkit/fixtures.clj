@@ -65,7 +65,7 @@ test is still running."
                        (Thread/sleep (* timeout-seconds 1000))
                        (when-not @finished?
                          (println "Timeout after " timeout-seconds "seconds.")
-                         (System/exit -100))))
+                         (System/exit 99))))
         (.setDaemon true)
         (.start))
       (try
