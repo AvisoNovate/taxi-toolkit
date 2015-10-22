@@ -9,16 +9,30 @@
              [utils :refer :all]
              [assertions :as at]]))
 
+(defn smart-wait [checker el-spec]
+  "Waits for condition to be met for el-spec. If timeout is exceeded throws an exception with checker and el-spec information.
+  Useful when tests use common functions in different scenarios, adhering to DRY principle."
+  (try
+    (wait-until #(retry (partial checker (apply $ el-spec))) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException e
+      (throw (org.openqa.selenium.TimeoutException. (str "Timeout exceeded for: " checker " with el spec: " el-spec) e)))))
+
 (defn wait-for
   "Waits for element to appear in the DOM."
   [& el-spec]
-  (wait-until #(not (nil? (apply $ el-spec))) webdriver-timeout))
+  (smart-wait (complement nil?) el-spec))
 
 (defn wait-for-visible
   "Waits for element to be visible."
   [& el-spec]
   (apply wait-for el-spec)
-  (wait-until (fn [] (retry #(visible? (apply $ el-spec)))) webdriver-timeout))
+  (smart-wait visible? el-spec))
+
+(defn wait-for-hidden
+  "Waits for element to be hidden."
+  [& el-spec]
+  (apply wait-for el-spec)
+  (smart-wait (complement visible?) el-spec))
 
 (defn wait-for-text
   "Waits for element to contain given text. Typical use case is when
@@ -27,7 +41,7 @@
   and we want to assert on a new value."
   [txt & el-spec]
   (apply wait-for el-spec)
-  (wait-until #((str-eq txt) (text (apply $ el-spec))) webdriver-timeout))
+  (smart-wait (comp (str-eq txt) text) el-spec))
 
 (defn wait-for-enabled
   "Waits for element to be enabled."
@@ -73,7 +87,7 @@
 (defn wait-for-removed
   "Waits for an element to be removed from the DOM"
   [& el-spec]
-  (wait-until #(nil? (apply $ el-spec)) webdriver-timeout))
+  (smart-wait nil? el-spec))
 
 (defn wait-for-class
   "Waits for an element to have a certain class"
