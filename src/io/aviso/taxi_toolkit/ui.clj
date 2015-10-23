@@ -70,9 +70,34 @@
   (s/split (attribute el :class) #"\s+"))
 
 (defn fill-form
-  "Fill a form. Accepts a map of 'element - text' pairs."
-  [el-val]
-  (mapv (fn [[el txt]] (input-text (apply $ (as-vector el)) txt)) el-val))
+  "Fill a form. Accepts a map of 'element - value' pairs.
+
+  Also, waits until the element is enabled using clj-webdriver.taxi/wait-until.
+
+  Will invoke an appropriate function depending on the element charactericts:
+   - input[type=checkbox] or input[type=radio]- select/deselect, otherwise
+   - input/textarea - input-text, otherwise
+   - select - select-option
+
+  Takes either a vector [el value] pairs (or a map which would behave as such collection when applied to doseq)
+  or an even number of key-value pairs if we want to preserve the order."
+
+  [& el-val-or-entries]
+  (let [el-val (if (= (count el-val-or-entries) 1)
+                 el-val-or-entries
+                 (partition 2 el-val-or-entries))]
+
+    (doseq [[el-spec value] el-val]
+      (let [q (apply $ (as-vector el-spec))]
+        (wait-until #(enabled? q) webdriver-timeout)
+        (let [tag-name (s/lower-case (tag q))
+              type-attr (s/lower-case (or (attribute q "type") ""))]
+          (case tag-name
+            "select" (select-option q value)
+            ("textarea" "input") (case type-attr
+                                   ("radio" "checkbox") (if value (select q) (deselect q))
+                                   (input-text q value)))))))
+  el-val-or-entries)
 
 (defn clear-with-backspace
   "Clears the input by pressing the backspace key until it's empty."

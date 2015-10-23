@@ -1,4 +1,5 @@
-(ns io.aviso.taxi-toolkit.selectors.general)
+(ns io.aviso.taxi-toolkit.selectors.general
+  (:require [clojure.string :as string]))
 
 
 (defn by-xpath
@@ -13,10 +14,16 @@
   [& xs]
   {:css (apply str xs)})
 
+(defn- clean-up-xpath-value [val]
+  (str
+    "concat('"
+    (string/replace val "'" "', \"'\", '")
+    "', '')")) ;last empty string is needed to because concat('str') gives an error
+
 (defn by-attribute
   "Find element by attribute value"
   [attr-name attr-val]
-  (by-xpath (str "//*[@" attr-name "='" attr-val "']")))
+  (by-xpath (str "//*[@" attr-name "=" (clean-up-xpath-value attr-val) "]")))
 
 (defn by-class-name
   "Find element by CSS class name"
