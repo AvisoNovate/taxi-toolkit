@@ -13,7 +13,7 @@
   "Waits for condition to be met for el-spec. If timeout is exceeded throws an exception with checker and el-spec information.
   Useful when tests use common functions in different scenarios, adhering to DRY principle."
   (try
-    (wait-until #(retry (partial checker (apply $ el-spec))) webdriver-timeout)
+    (wait-until #(retry (fn [] (checker (apply $ el-spec)))) webdriver-timeout)
     (catch org.openqa.selenium.TimeoutException e
       (throw (org.openqa.selenium.TimeoutException. (str "Timeout exceeded for: " checker " with el spec: " el-spec) e)))))
 
