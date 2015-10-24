@@ -46,3 +46,18 @@
           (do
             (Thread/sleep 100)
             (retry f timestamp)))))))
+
+(defn retry-times
+  "Keeps retrying an action specified number of times (defaults to 10), with 100 ms delay between retries.
+Useful when an element is not available for the momen   (i.e. it's being animated or re-drawn by AngularJS scope change) and when the function
+execution takes time to perform."
+  ([f] (retry-times f 10))
+  ([f times]
+   (try
+     (f)
+     (catch Exception e
+       (if (<= times 0)
+         (throw e)
+         (do
+           (Thread/sleep 100)
+           (retry f (dec times))))))))
