@@ -90,8 +90,8 @@
     (doseq [[el-spec value] el-val]
       (let [q (apply $ (as-vector el-spec))]
         (wait-until #(and (enabled? q)
-                          (visible? q)
-                          webdriver-timeout))
+                          (visible? q))
+                    webdriver-timeout)
         (let [tag-name (s/lower-case (tag q))
               type-attr (s/lower-case (or (attribute q "type") ""))]
           (case tag-name
