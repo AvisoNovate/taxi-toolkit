@@ -8,6 +8,7 @@
 - Improved fill-form with waiting for fields to become enabled
 - Improved fill-form with select, radio and checkbox controls support
 - Improved fill-form with varargs support to reduce the number of parens
+- Added waiter to wait for a element (such as a button) to become disabled
 
 ## 0.2.0
 
