@@ -558,6 +558,12 @@ Waits for an element to appear in the DOM.
 
 Waits for an element to become enabled.
 
+#### wait-for-disabled
+
+`(wait-for-disabled :menu :log-out)`
+
+Waits for an element to become disabled.
+
 #### wait-for-ng-animations
 
 `(wait-for-ng-animations)`
