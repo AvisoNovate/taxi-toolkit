@@ -88,11 +88,14 @@
                  (partition 2 el-val-or-entries))]
 
     (doseq [[el-spec value] el-val]
-      (let [q (apply $ (as-vector el-spec))]
-        (wait-until #(and (enabled? q)
-                          (visible? q))
+      (let [q-getter #(apply $ (as-vector el-spec))]
+        (wait-until #(let [q (q-getter)]
+                      (and q
+                           (enabled? q)
+                           (visible? q)))
                     webdriver-timeout)
-        (let [tag-name (s/lower-case (tag q))
+        (let [q (q-getter)
+              tag-name (s/lower-case (tag q))
               type-attr (s/lower-case (or (attribute q "type") ""))]
           (case tag-name
             "select" (select-option q value)
