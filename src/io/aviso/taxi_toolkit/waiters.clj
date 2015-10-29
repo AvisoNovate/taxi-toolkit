@@ -7,7 +7,8 @@
             [io.aviso.taxi-toolkit
              [ui :refer :all]
              [utils :refer :all]
-             [assertions :as at]]))
+             [assertions :as at]])
+  (:import (java.util.regex Pattern)))
 
 (defn smart-wait [checker el-spec]
   "Waits for condition to be met for el-spec. If timeout is exceeded throws an exception with checker and el-spec information.
@@ -41,7 +42,11 @@
   and we want to assert on a new value."
   [txt & el-spec]
   (apply wait-for el-spec)
-  (smart-wait (comp (str-eq txt) text) el-spec))
+  (smart-wait (comp (condp instance? txt
+                          String (str-eq txt)
+                          Pattern (partial re-matches txt)
+                          Object txt)
+                    text) el-spec))
 
 (defn wait-for-disabled
   "Waits for element to be disabled."
