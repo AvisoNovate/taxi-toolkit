@@ -59,27 +59,22 @@
   "Waits for element to be enabled."
   [& el-spec]
   (apply wait-for el-spec)
-  (try
-    (wait-until #(enabled? (apply $ el-spec)) webdriver-timeout)
-    (catch org.openqa.selenium.TimeoutException err
-      (is false (str "Waited for element " el-spec " to be enabled.")))))
+  (smart-wait enabled? el-spec))
 
 (defn wait-for-url
   "Waits for the browser to load an URL which would match (partially)
   the given pattern or string."
   [url]
   (try
-    (wait-until #(re-find (re-pattern url) (current-url)))
-    (catch org.openqa.selenium.TimeoutException err
-      (is false (str "Expected URL to match: '" url "' but got: '" (current-url)"'")))))
+    (wait-until #(re-find (re-pattern url) (current-url)) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException e
+      (throw (org.openqa.selenium.TimeoutException. (str "Timeout exceeded for: " (current-url) " to match: " url) e))
+      )))
 
 (defn wait-for-present
   "Waits for an element to be considered present. Existing and visible."
   [& el-spec]
-  (try
-    (wait-until #(present? (apply $ el-spec)) webdriver-timeout)
-    (catch org.openqa.selenium.TimeoutException err
-      (is false (str "Waited for element " el-spec " to be present.")))))
+  (smart-wait present? el-spec))
 
 (defn wait-for-ng-animations
   "Waits for Angular animations to complete."
@@ -104,26 +99,20 @@
 (defn wait-for-class
   "Waits for an element to have a certain class"
   [cls & el-spec]
-  (try
-    (wait-until #(some #{cls} (classes (apply $ el-spec))) webdriver-timeout)
-    (catch org.openqa.selenium.TimeoutException err
-      (is false (str "Waited for class '" cls "' to appear on " el-spec " but it never did.")))))
+  (smart-wait #(some #{cls} (classes %)) el-spec))
 
 (defn wait-for-class-removed
   "Waits for an element to NOT have a certain class"
   [cls & el-spec]
-  (try
-    (wait-until #(nil? (some #{cls} (classes (apply $ el-spec)))) webdriver-timeout)
-    (catch org.openqa.selenium.TimeoutException err
-      (is false (str "Waited for element " el-spec " to NOT have class '" cls "', but that never happened.")))))
+  (smart-wait #(nil? (some #{cls} (classes (apply $ el-spec)))) el-spec))
 
 (defn wait-for-element-count
   "Waits for the number of elements to be found by a selector to match expected number."
   [no & el-spec]
   (try
     (wait-until #(= (count (apply $$ el-spec)) no) webdriver-timeout)
-    (catch org.openqa.selenium.TimeoutException err
-      (is false (str "Waited for exactly " no " elements to be found by selector " el-spec " but found " (count (apply $$ el-spec)))))))
+    (catch org.openqa.selenium.TimeoutException e
+      (throw (org.openqa.selenium.TimeoutException. (str "Timeout exceeded for: element count " no " with el spec: " el-spec) e)))))
 
 (defn a-hover
   "Hover an item."
