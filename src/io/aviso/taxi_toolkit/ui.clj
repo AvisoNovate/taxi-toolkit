@@ -84,9 +84,8 @@
 
   [& el-val-or-entries]
   (let [el-val (if (= (count el-val-or-entries) 1)
-                 el-val-or-entries
+                 (first el-val-or-entries)
                  (partition 2 el-val-or-entries))]
-
     (doseq [[el-spec value] el-val]
       (let [q (apply $ (as-vector el-spec))]
         (wait-until #(and (enabled? q)

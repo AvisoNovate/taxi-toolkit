@@ -1,5 +1,15 @@
 # CHANGELOG
 
+
+## 0.2.1
+
+- Introduced fixtures for selenium remote and JVM-timeout (before importing the namespace, make sure that selenium-server library in classpath, e.g. [org.seleniumhq.selenium/selenium-server "2.48.2" :scope "test"])
+- Added url resolving for applications being tested in multi-machine environments
+- Improved fill-form with waiting for fields to become enabled
+- Improved fill-form with select, radio and checkbox controls support
+- Improved fill-form with varargs support to reduce the number of parens
+- Added waiter to wait for a element (such as a button) to become disabled
+
 ## 0.2.0
 
 - Improved fail message for some waiters.
