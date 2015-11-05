@@ -13,15 +13,29 @@ A Clojure library designed to help with writing integration tests using
             [clj-webdriver.taxi :refer :all]
             ;; Require all symbols from the index namespace. It contains
             ;; all symbols from the taxi-toolkit.
-            [io.aviso.taxi-toolkit.index :refer :all]))
+            [io.aviso.taxi-toolkit.index :refer :all]
+            ;import separately, as importing this namespace requires selenium-server (e.g.
+            ;[org.seleniumhq.selenium/selenium-server "2.48.2" :scope "test"]) to be present in classpath
+            [io.aviso.taxi-toolkit.fixtures :as fixtures]
+            [io.aviso.taxi-toolkit.url :as url]))
+
+
+(use-fixtures
+  :once
+  (fixtures/jvm-timeout-fixture 300)
+  ;you can place your app starting fixture here
+  (fixtures/webdriver-remote-fixture 30000 {:width 1680 :height 1050} {:browser :firefox}))
 
 ;; Declare all the UI elements on which you wish to assert later.
 ;; Functions (by-...) are so-called "selectors" - they return a map
 ;; in a form accepted by (taxi/find-element).
 (def ui {:search-btn (by-ng-click "search()")
-         :form       {:self (by-class-name ".search-form")
-                      :name (by-ng-model "query.name")
-                      :age  (by-ng-model "query.name")}
+         :form       {:self   (by-class-name ".search-form")
+                      :name   (by-ng-model "query.name")
+                      :age    (by-ng-model "query.name")
+                      :title  (by-ng-model "query.title") ;select
+                      :active (by-ng-model "query.active") ;checkbox
+                      }
          :results    {:self (by-role "result-table")
                       :all-rows (by-class-name ".row")}})
 
@@ -29,7 +43,7 @@ A Clojure library designed to help with writing integration tests using
   ;; Register UI map
   (set-ui-spec! ui)
 
-  (open-tested-page)
+  (get-url (url/app-url "/form.html"))
 
   ;; (assert-ui) accepts a map, where keys refer to the UI elements declared
   ;; in the UI map, and values are an assertions (or vector of assertions).
@@ -39,8 +53,16 @@ A Clojure library designed to help with writing integration tests using
               :results             is-hidden?})
 
   ;; (fill-form) is a helper to quickly input text into multiple UI elements.
-  (fill-form {:name "Jorge Luis Borges"
-              :age "115"})
+  (fill-form {:name   "Jorge Luis Borges"
+              :age    "115"
+              :title  {:value "Mr"}
+              :active true})
+
+  ;; syntax below will work too and preserve the order:
+  (fill-form :name   "Jorge Luis Borges"
+             :age    "115"
+             :title  {:value "Mr"}
+             :active true)
 
   (a-click :filter-btn)
   (wait-for-visible :results)
@@ -535,6 +557,12 @@ Waits for an element to appear in the DOM.
 `(wait-for-enabled :menu :log-out)`
 
 Waits for an element to become enabled.
+
+#### wait-for-disabled
+
+`(wait-for-disabled :menu :log-out)`
+
+Waits for an element to become disabled.
 
 #### wait-for-ng-animations
 

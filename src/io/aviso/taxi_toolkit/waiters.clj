@@ -61,6 +61,15 @@
   (apply wait-for el-spec)
   (smart-wait enabled? el-spec))
 
+(defn wait-for-disabled
+  "Waits for element to be disabled."
+  [& el-spec]
+  (apply wait-for el-spec)
+  (try
+    (wait-until #(not (enabled? (apply $ el-spec))) webdriver-timeout)
+    (catch org.openqa.selenium.TimeoutException err
+      (is false (str "Waited for element " el-spec " to be disabled.")))))
+
 (defn wait-for-url
   "Waits for the browser to load an URL which would match (partially)
   the given pattern or string."
