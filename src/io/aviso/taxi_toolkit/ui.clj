@@ -97,12 +97,12 @@
               tag-name (s/lower-case (tag q))
               type-attr (s/lower-case (or (attribute q "type") ""))]
           (case tag-name
-            "select" (select-option q value)
+            "select" (retry-times #(select-option q value) 5)
             ("textarea" "input") (case type-attr
-                                   ("radio" "checkbox") (if value (select q) (deselect q))
-                                   (do
-                                     (clear q)
-                                     (input-text q value))))))))
+                                   ("radio" "checkbox") (retry-times #(if value (select q) (deselect q)) 5)
+                                   (retry-times #(do
+                                                  (clear q)
+                                                  (input-text q value)))))))))
   el-val-or-entries)
 
 (defn clear-with-backspace
