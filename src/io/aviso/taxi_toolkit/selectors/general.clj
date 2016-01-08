@@ -23,12 +23,12 @@
 (defn by-attribute
   "Find element by attribute value"
   [attr-name attr-val]
-  (by-xpath (str "//*[@" attr-name "=" (clean-up-xpath-value attr-val) "]")))
+  (by-css (str "[" attr-name "='" attr-val "']")))
 
 (defn by-class-name
   "Find element by CSS class name"
   [class-name]
-  (by-xpath "//*[contains(@class, '" class-name "')]"))
+  (by-css (str "." class-name)))
 
 (defn by-role
   "Find element by role"
