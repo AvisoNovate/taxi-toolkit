@@ -64,6 +64,12 @@
     ("input") (retry #(value el))
     (retry #(text el))))
 
+(defn js-click
+  "Invokes click event on an element using DOM API."
+  [& el-spec]
+  (let [el (apply $ el-spec)]
+    (wd/execute-script *driver* "arguments[0].click();" (:webelement el))))
+
 (defn classes
   "Return list of CSS classes element has applied directly (via attribute)."
   [el]
