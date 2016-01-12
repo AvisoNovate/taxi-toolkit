@@ -10,9 +10,10 @@
              [assertions :as at]])
   (:import (java.util.regex Pattern)))
 
-(defn smart-wait [checker el-spec]
+(defn smart-wait
   "Waits for condition to be met for el-spec. If timeout is exceeded throws an exception with checker and el-spec information.
   Useful when tests use common functions in different scenarios, adhering to DRY principle."
+  [checker el-spec]
   (try
     (wait-until #(retry-times (fn [] (checker (apply $ el-spec)))) webdriver-timeout)
     (catch org.openqa.selenium.TimeoutException e
@@ -77,8 +78,7 @@
   (try
     (wait-until #(re-find (re-pattern url) (current-url)) webdriver-timeout)
     (catch org.openqa.selenium.TimeoutException e
-      (throw (org.openqa.selenium.TimeoutException. (str "Timeout exceeded for: " (current-url) " to match: " url) e))
-      )))
+      (throw (org.openqa.selenium.TimeoutException. (str "Timeout exceeded for: " (current-url) " to match: " url) e)))))
 
 (defn wait-for-present
   "Waits for an element to be considered present. Existing and visible."
