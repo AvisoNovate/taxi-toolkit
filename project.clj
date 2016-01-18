@@ -4,4 +4,7 @@
   :license {:name "Apache Software License 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
   :dependencies [[org.clojure/clojure "1.5.0"]
-                 [potemkin "0.3.12"]])
+                 [potemkin "0.3.12"]
+                 [clj-webdriver "0.7.2"]
+                 [org.seleniumhq.selenium/selenium-java "2.48.2"]
+                 [org.seleniumhq.selenium/selenium-api "2.48.2"]])
