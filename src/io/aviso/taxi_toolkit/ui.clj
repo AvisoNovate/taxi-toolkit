@@ -81,9 +81,9 @@
   Also, waits until the element is enabled using clj-webdriver.taxi/wait-until.
 
   Will invoke an appropriate function depending on the element charactericts:
+   - select - select-option,
    - input[type=checkbox] or input[type=radio]- select/deselect, otherwise
-   - input/textarea - input-text, otherwise
-   - select - select-option
+   - input/textarea - clear and input-text
 
   Takes either a vector [el value] pairs (or a map which would behave as such collection when applied to doseq)
   or an even number of key-value pairs if we want to preserve the order."
@@ -93,15 +93,22 @@
                  (first el-val-or-entries)
                  (partition 2 el-val-or-entries))]
     (doseq [[el-spec value] el-val]
-      (let [q (apply $ (as-vector el-spec))]
-        (wait-until #(enabled? q) webdriver-timeout)
-        (let [tag-name (s/lower-case (tag q))
+      (let [q-getter #(apply $ (as-vector el-spec))]
+        (wait-until #(let [q (q-getter)]
+                      (and q
+                           (enabled? q)
+                           (visible? q)))
+                    webdriver-timeout)
+        (let [q (q-getter)
+              tag-name (s/lower-case (tag q))
               type-attr (s/lower-case (or (attribute q "type") ""))]
           (case tag-name
-            "select" (select-option q value)
+            "select" (retry-times #(select-option q value) 5)
             ("textarea" "input") (case type-attr
-                                   ("radio" "checkbox") (if value (select q) (deselect q))
-                                   (input-text q value)))))))
+                                   ("radio" "checkbox") (retry-times #(if value (select q) (deselect q)) 5)
+                                   (retry-times #(do
+                                                  (clear q)
+                                                  (input-text q value)))))))))
   el-val-or-entries)
 
 (defn clear-with-backspace
