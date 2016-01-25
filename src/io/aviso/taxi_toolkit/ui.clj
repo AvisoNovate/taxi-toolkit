@@ -1,7 +1,7 @@
 (ns io.aviso.taxi-toolkit.ui
   "Set of helper functions for interacting with DOM elements."
   (:require [clj-webdriver.taxi :refer :all]
-            [clj-webdriver.core :refer [->actions move-to-element click-and-hold release]]
+            [clj-webdriver.core :refer [->actions move-to-element click-and-hold release] :as wd]
             [clojure.string :as s]
             [clojure.test :refer [is]]
             [io.aviso.taxi-toolkit
@@ -11,7 +11,6 @@
 
 (def webdriver-timeout (* 15 1000))
 (def ^:private ui-maps (atom {}))
-
 
 (defn set-ui-spec!
   [& xs]
