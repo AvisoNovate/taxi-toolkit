@@ -56,8 +56,8 @@ execution takes time to perform."
    (try
      (f)
      (catch Exception e
-       (if (<= times 0)
+       (if (<= times 1)
          (throw e)
          (do
            (Thread/sleep 100)
-           (retry f (dec times))))))))
+           (retry-times f (dec times))))))))

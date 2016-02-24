@@ -1,6 +1,6 @@
 (ns io.aviso.taxi-toolkit.ui
   "Set of helper functions for interacting with DOM elements."
-  (:require [clj-webdriver.taxi :refer :all]
+  (:require [clj-webdriver.taxi :refer :all :as taxi]
             [clj-webdriver.core :refer [->actions move-to-element click-and-hold release]]
             [clojure.string :as s]
             [clojure.test :refer [is]]
@@ -68,7 +68,7 @@
   "Invokes click event on an element using DOM API."
   [& el-spec]
   (let [el (apply $ el-spec)]
-    (wd/execute-script *driver* "arguments[0].click();" (:webelement el))))
+    (taxi/execute-script *driver* "arguments[0].click();" (:webelement el))))
 
 (defn classes
   "Return list of CSS classes element has applied directly (via attribute)."
