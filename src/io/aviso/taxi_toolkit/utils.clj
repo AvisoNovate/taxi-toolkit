@@ -60,4 +60,4 @@ execution takes time to perform."
          (throw e)
          (do
            (Thread/sleep 100)
-           (retry f (dec times))))))))
+           (retry-times f (dec times))))))))
