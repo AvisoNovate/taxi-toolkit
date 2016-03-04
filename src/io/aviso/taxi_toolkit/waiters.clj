@@ -108,12 +108,12 @@
 (defn wait-for-class
   "Waits for an element to have a certain class"
   [cls & el-spec]
-  (smart-wait #(some #{cls} (classes %)) el-spec))
+  (smart-wait #(some #{cls} (el-classes %)) el-spec))
 
 (defn wait-for-class-removed
   "Waits for an element to NOT have a certain class"
   [cls & el-spec]
-  (smart-wait #(nil? (some #{cls} (classes %))) el-spec))
+  (smart-wait #(nil? (some #{cls} (el-classes %))) el-spec))
 
 (defn wait-for-element-count
   "Waits for the number of elements to be found by a selector to match expected number."

@@ -1,7 +1,6 @@
 (ns io.aviso.taxi-toolkit.ui
   "Set of helper functions for interacting with DOM elements."
   (:require [clj-webdriver.taxi :refer :all :as taxi]
-            [clj-webdriver.core :refer [->actions move-to-element click-and-hold release]]
             [clojure.string :as s]
             [clojure.test :refer [is]]
             [io.aviso.taxi-toolkit
@@ -46,11 +45,10 @@
 (defn click-non-clickable
   "Similar to (taxi/click), but works with non-clickable elements such as <div>
    or <li>."
-  [el]
-  (->actions *driver*
-           (move-to-element el)
-           (click-and-hold el)
-           (release el)))
+  [& el-spec]
+  (retrying
+   (let [el (apply $ el-spec)]
+     (el-click-non-clickable el))))
 
 (defn a-click
   "Element-agnostic. Runs either (taxi/click) or (click-anything)."
@@ -59,19 +57,15 @@
    (let [el (apply $ el-spec)]
      (case (.getTagName (:webelement el))
        ("a" "button") (click el)
-       (click-non-clickable el)))))
+       (el-click-non-clickable el)))))
 
 (defn a-text
   "For non-form elements such as <div> works like (taxi/text).
   For <input> works like (taxi/value)."
-  [el]
-  ;; TODO: this one is sometimes used as a checker in smart-wait/wait-until
-  ;; and sometimes as a standalone operation. The retrying here is not needed
-  ;; in case of smart-wait
+  [& el-spec]
   (retrying
-   (case (.getTagName (:webelement el))
-     ("input") (value el)
-     (text el))))
+   (let [el (apply $ el-spec)]
+     (el-text el))))
 
 (defn js-click
   "Invokes click event on an element using DOM API."
@@ -82,8 +76,10 @@
 
 (defn classes
   "Return list of CSS classes element has applied directly (via attribute)."
-  [el]
-  (s/split (attribute el :class) #"\s+"))
+  [& el-spec]
+  (retrying
+   (let [el (apply $ el-spec)]
+     (el-classes el))))
 
 (defn fill-form
   "Fill a form. Accepts a map of 'element - value' pairs.
@@ -130,5 +126,5 @@
   [& el-spec]
   (retrying
    (let [el (apply $ el-spec)
-         n-of-strokes (count (a-text el))]
+         n-of-strokes (count (el-text el))]
      (doall (repeatedly n-of-strokes #(send-keys el org.openqa.selenium.Keys/BACK_SPACE))))))

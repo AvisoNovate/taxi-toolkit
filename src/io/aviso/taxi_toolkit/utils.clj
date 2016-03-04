@@ -1,5 +1,7 @@
 (ns io.aviso.taxi-toolkit.utils
-  (:require [clojure.string :as s])
+  (:require [clojure.string :as s]
+            [clj-webdriver.core :refer [->actions move-to-element click-and-hold release]]
+            [clj-webdriver.taxi :as taxi])
   (:import [org.openqa.selenium TimeoutException]))
 
 (defn str-eq
@@ -67,3 +69,25 @@
         :else (do
                 (Thread/sleep 17)
                 (recur (wrapped)))))))
+
+(defn el-text
+  "For non-form elements such as <div> works like (taxi/text).
+  For <input> works like (taxi/value)."
+  [el]
+  (case (.getTagName (:webelement el))
+    ("input") (taxi/value el)
+    (taxi/text el)))
+
+(defn el-classes
+  "Splits the class attribute to obtain list of element classes."
+  [el]
+  (s/split (taxi/attribute el :class) #"\s+"))
+
+(defn el-click-non-clickable
+  "Similar to (taxi/click), but works with non-clickable elements such as <div>
+   or <li>."
+  [el]
+  (->actions taxi/*driver*
+             (move-to-element el)
+             (click-and-hold el)
+             (release el)))
