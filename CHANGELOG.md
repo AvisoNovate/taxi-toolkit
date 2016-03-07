@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.2.4
+
+- Changed the behaviour of actions to use the same retrying mechanism as `assert-ui`. This should make the testing more deterministic against libraries that re-render the UI often.
+- Unified the API to avoid using element references, this changed `a-text` and `classes` signatures. Those functions also employ retrying mechanism so they are meant to be used
+  for test logic, not for assertions (assertions work on element references as they are to be used from within `assert-ui`).
+  
+## 0.2.3
+
+- Changed the behaviour of `assert-ui` to retry on exception to avoid having explicitly wait for element before asserting and to avoid various exceptions caused by stale references.
 
 ## 0.2.1
 
