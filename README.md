@@ -636,7 +636,7 @@ Works like `taxi/click` for elements such as `<a>` or `<button>`, and like
 
 #### a-text
 
-`(a-text ($ :menu :log-out))`
+`(a-text :menu :log-out)`
 
 Works like `taxi/text` for elements such as `<div>` or `<p>`, and like
 `taxi/value` for form elements like `<input>`.
@@ -647,7 +647,7 @@ Works like `taxi/text` for elements such as `<div>` or `<p>`, and like
 
 #### click-non-clickable
 
-`(click-non-clickable ($ :menu :log-out))`
+`(click-non-clickable :menu :log-out)`
 
 Clicks elements that are not anchors or buttons. Works by moving the cursor
 on top of that element, then pressing and releasing a mouse button.

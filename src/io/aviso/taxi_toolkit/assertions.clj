@@ -11,7 +11,7 @@
   "UI assertion for text content. Use either text or regular expression."
   [txt]
   (fn [el]
-    (let [actual-txt (s/trim (a-text el))]
+    (let [actual-txt (s/trim (el-text el))]
       (is ((str-eq txt) actual-txt) (format "Expected <<%s>> Actual <<%s>>." txt actual-txt)))))
 
 (defn has-attr?
@@ -63,13 +63,13 @@
   "UI assertion for a CSS class to exist on a certain element."
   [css-class]
   (fn [el]
-    (is (not (nil? (some #{css-class} (classes el)))) (str "Expected element to have the class '" css-class "' but it didn't.  It had: " (classes el) "."))))
+    (is (not (nil? (some #{css-class} (el-classes el)))) (str "Expected element to have the class '" css-class "' but it didn't.  It had: " (el-classes el) "."))))
 
 (defn has-no-class?
   "UI assertion for a CSS class to NOT exist on a certain element."
   [css-class]
   (fn [el]
-    (is (nil? (some #{css-class} (classes el))) (str "Expected element to NOT have the class '" css-class "' but it did. It had: " (classes el) "."))))
+    (is (nil? (some #{css-class} (el-classes el))) (str "Expected element to NOT have the class '" css-class "' but it did. It had: " (el-classes el) "."))))
 
 (defn is-selected?
   "UI assertion for an <option> element to be selected."

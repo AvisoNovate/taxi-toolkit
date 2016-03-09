@@ -1,7 +1,6 @@
 (ns io.aviso.taxi-toolkit.ui
   "Set of helper functions for interacting with DOM elements."
   (:require [clj-webdriver.taxi :refer :all :as taxi]
-            [clj-webdriver.core :refer [->actions move-to-element click-and-hold release]]
             [clojure.string :as s]
             [clojure.test :refer [is]]
             [io.aviso.taxi-toolkit
@@ -12,6 +11,10 @@
 (def webdriver-timeout (* 15 1000))
 (def ^:private ui-maps (atom {}))
 
+(defmacro retrying
+  "Just a convenience macro."
+  [& body]
+  `(retry-till-timeout webdriver-timeout (fn [] ~@body)))
 
 (defn set-ui-spec!
   [& xs]
@@ -42,38 +45,41 @@
 (defn click-non-clickable
   "Similar to (taxi/click), but works with non-clickable elements such as <div>
    or <li>."
-  [el]
-  (->actions *driver*
-           (move-to-element el)
-           (click-and-hold el)
-           (release el)))
+  [& el-spec]
+  (retrying
+   (let [el (apply $ el-spec)]
+     (el-click-non-clickable el))))
 
 (defn a-click
   "Element-agnostic. Runs either (taxi/click) or (click-anything)."
   [& el-spec]
-  (let [el (apply $ el-spec)]
-    (case (.getTagName (:webelement el))
-      ("a" "button") (retry #(click el))
-      (retry #(click-non-clickable el)))))
+  (retrying
+   (let [el (apply $ el-spec)]
+     (case (.getTagName (:webelement el))
+       ("a" "button") (click el)
+       (el-click-non-clickable el)))))
 
 (defn a-text
   "For non-form elements such as <div> works like (taxi/text).
   For <input> works like (taxi/value)."
-  [el]
-  (case (.getTagName (:webelement el))
-    ("input") (retry #(value el))
-    (retry #(text el))))
+  [& el-spec]
+  (retrying
+   (let [el (apply $ el-spec)]
+     (el-text el))))
 
 (defn js-click
   "Invokes click event on an element using DOM API."
   [& el-spec]
-  (let [el (apply $ el-spec)]
-    (taxi/execute-script *driver* "arguments[0].click();" (:webelement el))))
+  (retrying
+   (let [el (apply $ el-spec)]
+     (taxi/execute-script *driver* "arguments[0].click();" (:webelement el)))))
 
 (defn classes
   "Return list of CSS classes element has applied directly (via attribute)."
-  [el]
-  (s/split (attribute el :class) #"\s+"))
+  [& el-spec]
+  (retrying
+   (let [el (apply $ el-spec)]
+     (el-classes el))))
 
 (defn fill-form
   "Fill a form. Accepts a map of 'element - value' pairs.
@@ -91,29 +97,34 @@
   [& el-val-or-entries]
   (let [el-val (if (= (count el-val-or-entries) 1)
                  (first el-val-or-entries)
-                 (partition 2 el-val-or-entries))]
+                 (partition 2 el-val-or-entries))
+        start (System/currentTimeMillis)]
     (doseq [[el-spec value] el-val]
-      (let [q-getter #(apply $ (as-vector el-spec))]
-        (wait-until #(let [q (q-getter)]
-                      (and q
-                           (enabled? q)
-                           (visible? q)))
-                    webdriver-timeout)
-        (let [q (q-getter)
-              tag-name (s/lower-case (tag q))
-              type-attr (s/lower-case (or (attribute q "type") ""))]
-          (case tag-name
-            "select" (retry-times #(select-option q value) 5)
-            ("textarea" "input") (case type-attr
-                                   ("radio" "checkbox") (retry-times #(if value (select q) (deselect q)) 5)
-                                   (retry-times #(do
-                                                  (clear q)
-                                                  (input-text q value)))))))))
+      (retry-till-timeout webdriver-timeout
+       (fn []
+         (let [q-getter #(apply $ (as-vector el-spec))]
+           (wait-until #(let [q (q-getter)]
+                          (and q
+                               (enabled? q)
+                               (visible? q)))
+                       webdriver-timeout)
+           (let [q (q-getter)
+                 tag-name (s/lower-case (tag q))
+                 type-attr (s/lower-case (or (attribute q "type") ""))]
+             (case tag-name
+               "select" (select-option q value)
+               ("textarea" "input") (case type-attr
+                                      ("radio" "checkbox") (if value (select q) (deselect q))
+                                      (do
+                                        (clear q)
+                                        (input-text q value)))))))
+       :start start)))
   el-val-or-entries)
 
 (defn clear-with-backspace
   "Clears the input by pressing the backspace key until it's empty."
   [& el-spec]
-  (let [el (apply $ el-spec)
-        n-of-strokes (count (a-text el))]
-    (doall (repeatedly n-of-strokes #(send-keys el org.openqa.selenium.Keys/BACK_SPACE)))))
+  (retrying
+   (let [el (apply $ el-spec)
+         n-of-strokes (count (el-text el))]
+     (doall (repeatedly n-of-strokes #(send-keys el org.openqa.selenium.Keys/BACK_SPACE))))))

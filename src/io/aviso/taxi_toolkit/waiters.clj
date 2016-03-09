@@ -15,7 +15,7 @@
   Useful when tests use common functions in different scenarios, adhering to DRY principle."
   [checker el-spec]
   (try
-    (wait-until #(retry-times (fn [] (checker (apply $ el-spec)))) webdriver-timeout)
+    (retry-till-timeout webdriver-timeout #() :pred #(checker (apply $ el-spec)))
     (catch org.openqa.selenium.TimeoutException e
       (throw (org.openqa.selenium.TimeoutException. (str "Timeout exceeded for: " checker " with el spec: " el-spec) e)))))
 
@@ -95,9 +95,9 @@
   (Thread/sleep 500))
 
 (defn wait-and-click
-  "Waits for an element to appear, and then clicks it."
+  "Waits for an element to be enabled, and then clicks it."
   [& el-spec]
-  (apply wait-for el-spec)
+  (smart-wait enabled? el-spec)
   (apply a-click el-spec))
 
 (defn wait-for-removed
@@ -108,12 +108,12 @@
 (defn wait-for-class
   "Waits for an element to have a certain class"
   [cls & el-spec]
-  (smart-wait #(some #{cls} (classes %)) el-spec))
+  (smart-wait #(some #{cls} (el-classes %)) el-spec))
 
 (defn wait-for-class-removed
   "Waits for an element to NOT have a certain class"
   [cls & el-spec]
-  (smart-wait #(nil? (some #{cls} (classes %))) el-spec))
+  (smart-wait #(nil? (some #{cls} (el-classes %))) el-spec))
 
 (defn wait-for-element-count
   "Waits for the number of elements to be found by a selector to match expected number."

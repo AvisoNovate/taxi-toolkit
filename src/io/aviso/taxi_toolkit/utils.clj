@@ -1,5 +1,8 @@
 (ns io.aviso.taxi-toolkit.utils
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [clj-webdriver.core :refer [->actions move-to-element click-and-hold release]]
+            [clj-webdriver.taxi :as taxi])
+  (:import [org.openqa.selenium TimeoutException]))
 
 (defn str-eq
   "Returns an equality comparator for a string-ish needle,
@@ -47,17 +50,44 @@
             (Thread/sleep 100)
             (retry f timestamp)))))))
 
-(defn retry-times
-  "Keeps retrying an action specified number of times (defaults to 10), with 100 ms delay between retries.
-Useful when an element is not available for the momen   (i.e. it's being animated or re-drawn by AngularJS scope change) and when the function
-execution takes time to perform."
-  ([f] (retry-times f 10))
-  ([f times]
-   (try
-     (f)
-     (catch Exception e
-       (if (<= times 1)
-         (throw e)
-         (do
-           (Thread/sleep 100)
-           (retry-times f (dec times))))))))
+(defn retry-till-timeout
+  "Keeps retrying an action till the specified timeout described by value in milliseconds,
+  with optionally overriden start time. Additionaly, a predicate can be passed which causes
+  a retry if action is successful, but predicate is not."
+  [timeout f & {:keys [pred start]
+                :or {pred (constantly true)
+                     start (System/currentTimeMillis)}}]
+  (let [wrapped #(try [::success (f) (pred)] (catch Exception e [::error e false]))]
+    (loop [[tag ret check] (wrapped)]
+      (cond
+        (and (= tag ::success) check)
+        ret
+        (> (System/currentTimeMillis) (+ start timeout))
+        (if (instance? Throwable ret)
+          (throw ret)
+          (throw (TimeoutException.)))
+        :else (do
+                (Thread/sleep 17)
+                (recur (wrapped)))))))
+
+(defn el-text
+  "For non-form elements such as <div> works like (taxi/text).
+  For <input> works like (taxi/value)."
+  [el]
+  (case (.getTagName (:webelement el))
+    ("input") (taxi/value el)
+    (taxi/text el)))
+
+(defn el-classes
+  "Splits the class attribute to obtain list of element classes."
+  [el]
+  (s/split (taxi/attribute el :class) #"\s+"))
+
+(defn el-click-non-clickable
+  "Similar to (taxi/click), but works with non-clickable elements such as <div>
+   or <li>."
+  [el]
+  (->actions taxi/*driver*
+             (move-to-element el)
+             (click-and-hold el)
+             (release el)))

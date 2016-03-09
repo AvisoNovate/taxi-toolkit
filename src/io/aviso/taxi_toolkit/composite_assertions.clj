@@ -24,25 +24,25 @@
                                          (is true)
                                          (do (swap! j dec)
                                              (throw (ex-info "assertion has thrown an exception" {})))))]
-                  (is (retry-find+assert find-fn assert-fn))
+                  (is (retry-find+assert (System/currentTimeMillis) find-fn assert-fn))
                   (is (= 0 @i))
-                  (is (retry-find+assert find-fn throw-fn))
+                  (is (retry-find+assert (System/currentTimeMillis) find-fn throw-fn))
                   (is (= 0 @j))))}
-  [find-fn assert-fn]
+  [start find-fn assert-fn]
   (let [result (atom false)
         test-report test/report
         spy-report (fn [data]
                      (case (:type data)
-                       :fail nil
-                       :error nil
+                       (:fail :error) nil
                        :pass (do (reset! result true)
                                  (test-report data))
                        (test-report data)))
         retriable #(let [return (assert-fn (find-fn))]
-                    (when-not @result (throw (ex-info "forcing a retry" {})))
-                    return)
-        return (with-redefs [test/report spy-report]
-                 (try (retry-times retriable)
+                     (if return
+                       (reset! result true)
+                       (throw (ex-info "forcing a retry" {}))))
+        return (binding [test/report spy-report]
+                 (try (retry-till-timeout webdriver-timeout retriable :start start)
                       (catch ExceptionInfo e nil)))]
     (if @result
       return
@@ -68,13 +68,15 @@
   If the assertion expects a collection of elements, use :all hint:
     (assert-ui {^:all [:some-element-collection] (count= 3)})"
   [m]
-  (doseq [[el-spec asserts] m
-          assert-fn (as-vector asserts)]
-    (let [collection? (-> el-spec meta :all)
-          finder (if collection? $$ $)
-          el-spec-vector (as-vector el-spec)
-          find-fn #(apply finder el-spec-vector)]
-      (retry-find+assert find-fn assert-fn))))
+  ;; start from here so that timeout is per assert-ui, not per one assert function
+  (let [start (System/currentTimeMillis)]
+    (doseq [[el-spec asserts] m
+            assert-fn (as-vector asserts)]
+      (let [collection? (-> el-spec meta :all)
+            finder (if collection? $$ $)
+            el-spec-vector (as-vector el-spec)
+            find-fn #(apply finder el-spec-vector)]
+        (retry-find+assert start find-fn assert-fn)))))
 
 (defn assert-nav
   "Helper for asserting whether clicking element (or sequence of elements)
