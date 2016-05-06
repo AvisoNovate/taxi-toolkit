@@ -35,12 +35,13 @@
   with the proper values."
   [params & el-path]
   (let [nested? (not= 1 (count el-path))
-        el-spec (resolve-element-path @ui-maps el-path)
-        el-spec-resolved (into {} (map (fn [[k v]] [k (replace-all v params)]) el-spec))]
+        resolve-params (fn [id]
+                         (let [spec (resolve-element-path @ui-maps id)]
+                           (into {} (map (fn [[k v]] [k (replace-all v params)]) spec))))
+        el-spec (resolve-params el-path)]
     (if nested?
-      (let [parent-el-spec (resolve-element-path @ui-maps (first el-path))]
-        [parent-el-spec el-spec-resolved])
-      el-spec-resolved)))
+      [(resolve-params (first el-path)) el-spec]
+      el-spec)))
 
 (defn click-non-clickable
   "Similar to (taxi/click), but works with non-clickable elements such as <div>
