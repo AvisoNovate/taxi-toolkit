@@ -6,10 +6,11 @@
             [io.aviso.taxi-toolkit.composite-assertions]
             [io.aviso.taxi-toolkit.selectors.angular]
             [io.aviso.taxi-toolkit.selectors.general]
-            [io.aviso.taxi-toolkit.selectors.complex]))
+            [io.aviso.taxi-toolkit.selectors.complex]
+            [io.aviso.taxi-toolkit.logs]))
 
 (defn ns-public-symbols
-  "Returns a sequence of all public synbols from a namespace,
+  "Returns a sequence of all public symbols from a namespace,
   along with the namespace symbol itself (as a first element)."
   [x]
   (into [x] (keys (ns-publics x))))
@@ -28,3 +29,4 @@
 (import-ns-vars io.aviso.taxi-toolkit.selectors.general)
 (import-ns-vars io.aviso.taxi-toolkit.selectors.angular)
 (import-ns-vars io.aviso.taxi-toolkit.selectors.complex)
+(import-ns-vars io.aviso.taxi-toolkit.logs)
