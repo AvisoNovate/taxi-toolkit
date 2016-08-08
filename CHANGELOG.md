@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.8
+
+- Bugfix: x-is-missing? didn't work with non-nested spec maps.
+
 ## 0.2.7
 
 - **Breaking:** changed behaviour of x-is-missing?. It now accepts same arguments as query-with-params. This allows for nested spec support to be passed (works only with CSS selectors, not XPath ones, for now).

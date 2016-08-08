@@ -127,7 +127,7 @@
   "Faster assertion for missing element. Accepts same arguments as query-with-params.
   NOTE: doesn't accept nested XPath selectors yet."
   [& args]
-  (let [selector (apply query-with-params args)
+  (let [selector (as-vector (apply query-with-params args))
         js (if (:css (first selector))
              (str "return document.querySelectorAll(\"" (s/join " " (map :css selector)) "\").length;")
              (str "return document.evaluate(\"count(" (or (:xpath (first selector)) (first selector)) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
