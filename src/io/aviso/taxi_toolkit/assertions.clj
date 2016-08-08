@@ -124,14 +124,15 @@
 ; Faster (express) version of `is-missing?`
 ; Will not run with `assert-ui`
 (defn x-is-missing?
-  "Faster assertion for missing element."
-  [el-spec]
-  (let [selector (query-with-params {} el-spec)
-        js (if (:css selector)
-             (str "return document.querySelectorAll(\"" (:css selector) "\").length;")
-             (str "return document.evaluate(\"count(" (or (:xpath selector) selector) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
+  "Faster assertion for missing element. Accepts same arguments as query-with-params.
+  NOTE: doesn't accept nested XPath selectors yet."
+  [& args]
+  (let [selector (apply query-with-params args)
+        js (if (:css (first selector))
+             (str "return document.querySelectorAll(\"" (s/join " " (map :css selector)) "\").length;")
+             (str "return document.evaluate(\"count(" (or (:xpath (first selector)) (first selector)) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
         cnt (t/execute-script js)]
-    (is (= 0 cnt) (str "Element " el-spec " is not missing - found " cnt " of those."))))
+    (is (= 0 cnt) (str "Element for " args " is not missing - found " cnt " of those."))))
 
 (defn is-count?
   "UI assertion for number of elements."
