@@ -494,10 +494,11 @@ Asserts that element does not exist in the DOM.
 
 Asserts that element does not exist in the DOM.
 (faster than the regular `is-missing`, but can not
-be used in `assert-ui`).
+be used in `assert-ui`). Accept same arguments as query-with-params,
+but nested specs work only with CSS selectors.
 
 ```clojure
-(x-is-missing? :loader-animation)
+(x-is-missing? {} :loader-animation)
 ```
 
 #### is-selected?
