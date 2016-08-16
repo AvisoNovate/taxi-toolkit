@@ -82,6 +82,19 @@
    (let [el (apply $ el-spec)]
      (el-classes el))))
 
+(defn x-element-count
+  "Returns number of elements found with a given selector. Fast in a scenario where no elements
+  are to be found, because it doesn't use find-element, but a custom JS script.
+  Accepts same parameters as query-with-params.
+  NOTE: doesn't accept nested XPath selectors yet."
+  [& args]
+  (let [selector (as-vector (apply query-with-params args))
+        js (if (:css (first selector))
+             (str "return document.querySelectorAll(\"" (s/join " " (map :css selector)) "\").length;")
+             (str "return document.evaluate(\"count(" (or (:xpath (first selector)) (first selector)) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
+        cnt (execute-script js)]
+    cnt))
+
 (defn fill-form
   "Fill a form. Accepts a map of 'element - value' pairs.
 

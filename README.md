@@ -676,3 +676,10 @@ Given an input element, presses backspace key as many times as it takes to clear
 ```clojure
 (clear-with-backspace :some-el)
 ```
+
+### Other
+
+#### x-element-count
+
+Returns number of elements found for the given selector. Supports nested CSS selectors, but only
+one-level XPath ones. Accepts same arguments as [[query-with-params]].

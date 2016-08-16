@@ -124,15 +124,10 @@
 ; Faster (express) version of `is-missing?`
 ; Will not run with `assert-ui`
 (defn x-is-missing?
-  "Faster assertion for missing element. Accepts same arguments as query-with-params.
-  NOTE: doesn't accept nested XPath selectors yet."
+  "Faster assertion for missing element. Accepts same arguments as query-with-params."
   [& args]
-  (let [selector (as-vector (apply query-with-params args))
-        js (if (:css (first selector))
-             (str "return document.querySelectorAll(\"" (s/join " " (map :css selector)) "\").length;")
-             (str "return document.evaluate(\"count(" (or (:xpath (first selector)) (first selector)) ")\", document, null, XPathResult.NUMBER_TYPE, null).numberValue;"))
-        cnt (t/execute-script js)]
-    (is (= 0 cnt) (str "Element for " args " is not missing - found " cnt " of those."))))
+  (let [cnt (apply x-element-count args)]
+    (is (= 0 cnt)  (str "Element for " args " is not missing - found " cnt " of those."))))
 
 (defn is-count?
   "UI assertion for number of elements."

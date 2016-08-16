@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.9
+
+- New method: x-element-count that returns a number of elements that are found for a given selector. Supports nested CSS selectors, but only one-level XPath ones, just like x-is-missing?.
+
 ## 0.2.8
 
 - Bugfix: x-is-missing? didn't work with non-nested spec maps.
