@@ -47,7 +47,7 @@
                           String (str-eq txt)
                           Pattern (partial re-matches txt)
                           Object txt)
-                    text) el-spec))
+                    el-text) el-spec))
 
 (defn wait-for-disabled
   "Waits for element to be disabled."

@@ -1,16 +1,20 @@
 # CHANGELOG
 
+## 0.2.10
+
+- Bugfix: `wait-for-text` now works on inputs and textareas much like `a-text` does.
+
 ## 0.2.9
 
-- New method: x-element-count that returns a number of elements that are found for a given selector. Supports nested CSS selectors, but only one-level XPath ones, just like x-is-missing?.
+- New method: `x-element-count` that returns a number of elements that are found for a given selector. Supports nested CSS selectors, but only one-level XPath ones, just like `x-is-missing?`.
 
 ## 0.2.8
 
-- Bugfix: x-is-missing? didn't work with non-nested spec maps.
+- Bugfix: `x-is-missing?` didn't work with non-nested spec maps.
 
 ## 0.2.7
 
-- **Breaking:** changed behaviour of x-is-missing?. It now accepts same arguments as query-with-params. This allows for nested spec support to be passed (works only with CSS selectors, not XPath ones, for now).
+- **Breaking:** changed behaviour of `x-is-missing?`. It now accepts same arguments as query-with-params. This allows for nested spec support to be passed (works only with CSS selectors, not XPath ones, for now).
 
 ## 0.2.4
 
