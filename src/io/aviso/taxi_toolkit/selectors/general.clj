@@ -30,6 +30,11 @@
   [class-name]
   (by-css (str "." class-name)))
 
+(defn by-class-name-xpath
+  "Find element by CSS class name - uses XPath."
+  [class-name]
+  (by-xpath "//*[contains(@class,'" class-name "')]"))
+
 (defn by-role
   "Find element by role"
   [role]

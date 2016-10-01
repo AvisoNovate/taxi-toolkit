@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.11
+
+- `x-element-count`, and `x-is-missing?` now accept nested X-Path elements.
+- `by-class-name-xpath` - new selector.
+
 ## 0.2.10
 
 - Bugfix: `wait-for-text` now works on inputs and textareas much like `a-text` does.
