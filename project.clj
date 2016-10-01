@@ -1,4 +1,4 @@
-(defproject io.aviso/taxi-toolkit "0.2.11"
+(defproject io.aviso/taxi-toolkit "0.2.12-SNAPSHOT"
   :description "A Clojure library designed to help with writing integration tests using clj-webdriver."
   :url "https://github.com/AvisoNovate/taxi-toolkit"
   :license {:name "Apache Software License 2.0"
