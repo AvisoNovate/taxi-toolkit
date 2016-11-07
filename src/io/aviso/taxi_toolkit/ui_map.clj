@@ -42,8 +42,8 @@
       (if (or (= nil child-spec)
               (= :self child-spec))
         (f-one (resolve-element-path ui el-spec))
-        (f-nested (find-element (resolve-element-path ui parent-spec))
-                  (resolve-element-path ui el-spec))))))
+        (if-let [parent (find-element (resolve-element-path ui parent-spec))]
+          (f-nested parent (resolve-element-path ui el-spec)))))))
 
 (defn find-one
   "Find one element matching selector. See (find-with-f)."
