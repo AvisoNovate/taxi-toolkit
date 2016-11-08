@@ -57,7 +57,7 @@
   [timeout f & {:keys [pred start]
                 :or {pred (constantly true)
                      start (System/currentTimeMillis)}}]
-  (let [wrapped #(try [::success (f) (pred)] (catch Exception e [::error e false]))]
+  (let [wrapped #(try [::success (f) (pred)] (catch Throwable e [::error e false]))]
     (loop [[tag ret check] (wrapped)]
       (cond
         (and (= tag ::success) check)
