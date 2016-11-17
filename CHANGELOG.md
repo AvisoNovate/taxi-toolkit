@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.12
+
+- `try-click` and `try-js-click` actions that don't fail when element has gone prior to click
+
 ## 0.2.11
 
 - `x-element-count`, and `x-is-missing?` now accept nested X-Path elements.
