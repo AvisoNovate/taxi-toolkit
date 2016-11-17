@@ -43,22 +43,37 @@
       [(resolve-params (first el-path)) el-spec]
       el-spec)))
 
+(defn with-el
+  [el-spec action & {:keys [fail-on-missing?]
+                     :or {fail-on-missing? true}}]
+  (retrying
+   (if-let [el (apply $ el-spec)]
+     (action el)
+     (when fail-on-missing?
+       (throw (ex-info (str "Unable to perform an action on element: " el-spec)))))))
+
 (defn click-non-clickable
   "Similar to (taxi/click), but works with non-clickable elements such as <div>
    or <li>."
   [& el-spec]
-  (retrying
-   (let [el (apply $ el-spec)]
-     (el-click-non-clickable el))))
+  (with-el el-spec
+    el-click-non-clickable))
+
+(defn- click-anything
+  [el]
+  (case (.getTagName (:webelement el))
+    ("a" "button") (click el)
+    (el-click-non-clickable el)))
 
 (defn a-click
-  "Element-agnostic. Runs either (taxi/click) or (click-anything)."
+  "Element-agnostic. Runs either (taxi/click) or (taxi/el-click-non-clickable)."
   [& el-spec]
-  (retrying
-   (let [el (apply $ el-spec)]
-     (case (.getTagName (:webelement el))
-       ("a" "button") (click el)
-       (el-click-non-clickable el)))))
+  (with-el el-spec click-anything))
+
+(defn try-click
+  "Same as `a-click', doesn't fail when element is missing."
+  [& el-spec]
+  (with-el el-spec click-anything :fail-on-missing? false))
 
 (defn a-text
   "For non-form elements such as <div> works like (taxi/text).
@@ -71,9 +86,14 @@
 (defn js-click
   "Invokes click event on an element using DOM API."
   [& el-spec]
-  (retrying
-   (let [el (apply $ el-spec)]
-     (taxi/execute-script *driver* "arguments[0].click();" (:webelement el)))))
+  (with-el el-spec
+    #(execute-script "arguments[0].click();" (:webelement %))))
+
+(defn try-js-click
+  "Same as `try-js-click' but doesn't fail when element is missing."
+  [& el-spec]
+  (with-el el-spec
+    #(execute-script "arguments[0].click();" (:webelement %)) :fail-on-missing? false))
 
 (defn classes
   "Return list of CSS classes element has applied directly (via attribute)."
