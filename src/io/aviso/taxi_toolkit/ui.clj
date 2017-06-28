@@ -50,7 +50,7 @@
    (if-let [el (apply $ el-spec)]
      (action el)
      (when fail-on-missing?
-       (throw (ex-info (str "Unable to perform an action on element: " el-spec)))))))
+       (throw (ex-info (str "Unable to perform an action on element: " el-spec) {:el-spec el-spec}))))))
 
 (defn click-non-clickable
   "Similar to (taxi/click), but works with non-clickable elements such as <div>
