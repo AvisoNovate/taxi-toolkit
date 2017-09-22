@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.0-alpha1
+
+- `a-click` now doesn't fallback to actions, as it seems no longer necessary, and broken, with selenium 3.5.x.
+
 ## 0.2.12
 
 - `try-click` and `try-js-click` actions that don't fail when element has gone prior to click

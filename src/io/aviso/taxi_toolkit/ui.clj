@@ -59,21 +59,15 @@
   (with-el el-spec
     el-click-non-clickable))
 
-(defn- click-anything
-  [el]
-  (case (.getTagName (:webelement el))
-    ("a" "button") (click el)
-    (el-click-non-clickable el)))
-
 (defn a-click
   "Element-agnostic. Runs either (taxi/click) or (taxi/el-click-non-clickable)."
   [& el-spec]
-  (with-el el-spec click-anything))
+  (with-el el-spec click))
 
 (defn try-click
   "Same as `a-click', doesn't fail when element is missing."
   [& el-spec]
-  (with-el el-spec click-anything :fail-on-missing? false))
+  (with-el el-spec click :fail-on-missing? false))
 
 (defn a-text
   "For non-form elements such as <div> works like (taxi/text).
