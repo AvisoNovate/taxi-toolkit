@@ -96,6 +96,12 @@
    (let [el (apply $ el-spec)]
      (el-classes el))))
 
+(defn select-values-set
+  "Returns a set of strings corresponding to <select>'s options values."
+  [& el-spec]
+  (with-el el-spec
+    #(set (map value (options %)))))
+
 (defn x-element-count
   "Returns number of elements found with a given selector. Fast in a scenario where no elements
   are to be found, because it doesn't use find-element, but a custom JS script.

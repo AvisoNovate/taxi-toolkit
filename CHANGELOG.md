@@ -1,8 +1,16 @@
 # CHANGELOG
 
+## 0.3.0-alpha2
+
+- Merge with 0.2.14.
+
 ## 0.3.0-alpha1
 
 - `a-click` now doesn't fallback to actions, as it seems no longer necessary, and broken, with selenium 3.5.x.
+
+## 0.2.14
+
+- `select-values-set` - new function that returns a set of values of all options for a given select.
 
 ## 0.2.12
 
