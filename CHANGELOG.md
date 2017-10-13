@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.14
+
+- `select-values-set` - new function that returns a set of values of all options for a given select.
+
 ## 0.2.12
 
 - `try-click` and `try-js-click` actions that don't fail when element has gone prior to click
