@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.3.1
+
+- Fixed issue with invalid `require` that caused clojure.spec.alpha checks to fail.
+
+## 0.3.0
+
+Considered now stable with selenium 3.7.1.
+
 ## 0.3.0-alpha2
 
 - Merge with 0.2.14.
